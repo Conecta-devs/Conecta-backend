@@ -1,114 +1,238 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Conecta Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+API do Conecta, construída com NestJS e TypeScript. O projeto fornece autenticação de usuários com JWT e persistência em MongoDB por meio do workflow Prisma Next.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Tecnologias
 
-## Description
+- Node.js e npm
+- NestJS 12
+- TypeScript
+- Prisma 8 RC (`prisma-next` e `@prisma/orm-mongo`)
+- MongoDB, recomendado MongoDB Atlas
+- JWT e Passport para autenticação
+- bcrypt para hash de senhas
+- Vitest, Supertest e Oxlint
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Pré-requisitos
 
-## Project setup
+Antes de começar, instale:
 
-```bash
-$ npm install
-```
+- Node.js 20 ou superior
+- npm
+- Git
+- Acesso a uma instância MongoDB 8 ou superior
 
-## Compile and run the project
+O projeto foi validado com Node.js 24 e Prisma `8.0.0-rc.10`.
+
+## Primeira configuração
+
+Depois de clonar o repositório:
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+git clone <URL_DO_REPOSITORIO>
+cd conecta-backend
+npm install
 ```
 
-## Run tests
+Crie um arquivo `.env` na raiz do projeto. Você pode usar `.env.example` como referência:
+
+```env
+DATABASE_URL="mongodb://usuario:senha@host:27017/test"
+JWT_SECRET="gere-um-segredo-forte-e-unico"
+```
+
+Cada integrante deve configurar suas próprias credenciais e variáveis de ambiente. Nunca inclua credenciais reais no README, em commits ou em mensagens de pull request.
+
+## Configuração do ambiente
+
+### MongoDB
+
+`DATABASE_URL` deve ser uma URL MongoDB válida e incluir o nome do banco no caminho, por exemplo:
+
+```env
+DATABASE_URL="mongodb://usuario:senha@host:27017/conecta"
+```
+
+Para MongoDB Atlas, use a string de conexão fornecida pelo Atlas e confirme que o endereço IP está liberado na lista de acesso do cluster. O runtime atual aceita `mongodb://` e `mongodb+srv://`; a URL precisa ser compatível com o parser do runtime e conter um banco definido.
+
+### JWT
+
+`JWT_SECRET` é usado para assinar os tokens de acesso. Use um valor longo, aleatório e diferente em cada ambiente.
+
+Os tokens emitidos atualmente expiram em 15 minutos.
+
+## Banco de dados e Prisma
+
+Este projeto utiliza Prisma 8 RC com o workflow `prisma-next` e `@prisma/orm-mongo`.
+
+O contrato principal fica em `src/prisma/contract.prisma`. Os arquivos gerados que acompanham o contrato são:
+
+- `src/prisma/contract.json`
+- `src/prisma/contract.d.ts`
+
+Depois de alterar o contrato, regenere esses arquivos:
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npx prisma contract emit
 ```
 
-## Deployment
+Para verificar se o banco está de acordo com o contrato:
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+```powershell
+npx prisma db verify --db "$env:DATABASE_URL"
+```
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+Não use tutoriais antigos que indiquem `npx prisma generate` para este projeto. O workflow atual usa `contract emit` e o cliente definido em `src/prisma/db.ts`.
+
+## Executando o projeto
+
+### Desenvolvimento
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+npm run start:dev
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+A API fica disponível em `http://localhost:3000`.
 
-## Observability
+### Produção
 
-In production applications, observability is essential for understanding how your system behaves, detecting issues early, and maintaining reliable performance.
+```bash
+npm run build
+npm run start:prod
+```
 
-[NestJS Observe](https://observe.nestjs.com) automatically instruments your NestJS application, giving you deep visibility into your system with minimal setup:
+É possível alterar a porta usando `PORT`:
 
-- **Distributed tracing:** Follow requests across services and understand how they flow through your system.
-- **Waterfall analysis:** Visualize request execution and identify slow operations, bottlenecks, and unexpected delays.
-- **Performance analysis:** Analyze application performance in real time and quickly pinpoint areas that need optimization.
-- **Metrics:** Track key application and infrastructure metrics to understand system health and performance trends.
-- **Logging:** Centralize and correlate logs with traces and other telemetry to make debugging easier.
-- **Error tracking:** Detect errors quickly and investigate their root causes with the surrounding context.
-- **SLA monitoring:** Track service-level objectives and identify when your application is approaching or exceeding defined thresholds.
-- **Alarms and alerts:** Set up alerts for critical errors, performance degradation, SLA violations, and other anomalies so your team can react quickly.
+```env
+PORT=3000
+```
 
-## Resources
+## Autenticação
 
-Check out a few resources that may come in handy when working with NestJS:
+### Registrar usuário
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Auto-instrument your application with [NestJS Observer](https://observer.nestjs.com). Distributed tracing, metrics, and logging made easy. Error tracking and performance monitoring for your NestJS applications.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+`POST /auth/register`
 
-## Support
+```json
+{
+  "email": "usuario@example.com",
+  "name": "Nome do usuário",
+  "password": "senha-com-no-minimo-8-caracteres"
+}
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### Fazer login
 
-## Stay in touch
+`POST /auth/login`
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+```json
+{
+  "email": "usuario@example.com",
+  "password": "senha-com-no-minimo-8-caracteres"
+}
+```
 
-## License
+O login retorna um `accessToken`. Para acessar uma rota protegida, envie o token no cabeçalho:
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+```http
+Authorization: Bearer <accessToken>
+```
+
+### Consultar perfil
+
+`GET /auth/profile`
+
+Essa rota exige um token JWT válido.
+
+## Estrutura do projeto
+
+```text
+src/
+  app.controller.ts       # Rota inicial da aplicação
+  app.module.ts            # Módulo principal
+  main.ts                  # Bootstrap, porta e validação global
+  auth/                    # Registro, login e proteção JWT
+    dto/                   # Objetos de entrada validados
+    jwt-strategy/          # Estratégia Passport JWT
+  prisma/                  # Contrato e cliente MongoDB tipado
+    contract.prisma
+    contract.json
+    contract.d.ts
+test/                      # Testes end-to-end
+```
+
+## Comandos úteis
+
+```bash
+# Desenvolvimento com recarregamento automático
+npm run start:dev
+
+# Execução normal
+npm run start
+
+# Compilação
+npm run build
+
+# Execução do build
+npm run start:prod
+
+# Testes unitários
+npm test
+
+# Testes em modo watch
+npm run test:watch
+
+# Testes end-to-end
+npm run test:e2e
+
+# Cobertura de testes
+npm run test:cov
+
+# Lint
+npm run lint
+
+# Formatação
+npm run format
+```
+
+## Fluxo de trabalho
+
+Atualize sua branch local:
+
+```bash
+git pull
+```
+
+Crie uma branch para a alteração:
+
+```bash
+git checkout -b feature/nome-da-feature
+```
+
+Depois de implementar e testar:
+
+```bash
+git add .
+git commit -m "feat: descreve a alteração"
+git push -u origin feature/nome-da-feature
+```
+
+Use mensagens de commit curtas e descritivas, preferencialmente seguindo Conventional Commits (`feat`, `fix`, `test`, `docs`, `refactor` e similares). Abra um pull request para revisão antes de integrar a branch principal.
+
+## Variáveis de ambiente
+
+| Variável | Obrigatória | Descrição |
+|---|---:|---|
+| `DATABASE_URL` | Sim | URL de conexão do MongoDB, com o nome do banco no caminho |
+| `JWT_SECRET` | Sim | Segredo usado para assinar tokens JWT |
+| `PORT` | Não | Porta HTTP da API; padrão `3000` |
+
+O arquivo `.env` é ignorado pelo Git. Compartilhe valores de desenvolvimento por um canal seguro, nunca pelo repositório.
+
+## Equipe
+
+Preencha esta seção com os nomes, responsabilidades e canais oficiais da equipe do Conecta.
+
+## Licença
+
+Projeto privado. Consulte a equipe responsável antes de distribuir ou reutilizar o código.
