@@ -6,63 +6,73 @@ import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly jwtService: JwtService){}
+  constructor(private readonly jwtService: JwtService) {}
 
   async register(dto: RegisterDto) {
-  const existingUser = await db.orm.users
-    .where({
-      email: dto.email,
-    })
-    .first();
+    const normalizedEmail = dto.email.trim().toLowerCase();
 
-  if (existingUser) {
-    throw new ConflictException('Email já cadastrado');
+    const existingUser = await db.orm.users
+      .where({
+        email: normalizedEmail,
+      })
+      .first();
+
+    if (existingUser) {
+      throw new ConflictException('Email já cadastrado');
+    }
+
+    const passwordHash = await bcrypt.hash(dto.password, 10);
+
+    try {
+      const user = await db.orm.users.create({
+        email: normalizedEmail,
+        name: dto.name,
+        passwordHash,
+      });
+
+      return {
+        email: user.email,
+        name: user.name,
+      };
+    } catch (error: any) {
+      if (error && error.code === 11000) {
+        throw new ConflictException('Email já cadastrado');
+      }
+
+      throw error;
+    }
   }
-
-  const passwordHash = await bcrypt.hash(dto.password, 10);
-
-  const user = await db.orm.users.create({
-    email: dto.email,
-    name: dto.name,
-    passwordHash,
-  });
-
-  return {
-    email: user.email,
-    name: user.name,
-  };
-}
 
   async login(email: string, password: string) {
-  const user = await db.orm.users
-    .where({
-      email,
-    })
-    .first();
+    const normalizedEmail = email.trim().toLowerCase();
 
-  if (!user) {
-    throw new UnauthorizedException('Email ou senha inválidos');
+    const user = await db.orm.users
+      .where({
+        email: normalizedEmail,
+      })
+      .first();
+
+    if (!user) {
+      throw new UnauthorizedException('Email ou senha inválidos');
+    }
+
+    const passwordMatches = await bcrypt.compare(password, user.passwordHash);
+
+    if (!passwordMatches) {
+      throw new UnauthorizedException('Email ou senha inválidos');
+    }
+
+    const accessToken = this.jwtService.sign({
+      email: user.email,
+      name: user.name,
+    });
+
+    return {
+      accessToken,
+      user: {
+        email: user.email,
+        name: user.name,
+      },
+    };
   }
-
-  const passwordMatches = await bcrypt.compare(
-    password,
-    user.passwordHash,
-  );
-
-  if (!passwordMatches) {
-    throw new UnauthorizedException('Email ou senha inválidos');
-  }
-
-  const accessToken = this.jwtService.sign({
-  email: user.email,
-});
-
- return {
-  accessToken,
-  user: {
-    email: user.email,
-    name: user.name,
-  },
-  };
-}
 }

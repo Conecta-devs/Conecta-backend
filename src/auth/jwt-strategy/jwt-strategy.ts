@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-jwt';
 
+const jwtSecret = process.env.JWT_SECRET ?? 'dev-secret-change-me';
+
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor() {
@@ -22,7 +24,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         return token;
       },
 
-      secretOrKey: process.env.JWT_SECRET!,
+      secretOrKey: jwtSecret,
     });
   }
 
