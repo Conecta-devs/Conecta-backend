@@ -3,7 +3,6 @@ import { JwtAuthGuard } from './jwt-auth/jwt-auth.guard.js';
 import { AuthService } from './auth.service.js';
 import { RegisterDto } from './dto/register.dto.js';
 import { LoginDto } from './dto/login.dto.js';
-import { profile } from 'console';
 
 @Controller('auth')
 export class AuthController {
@@ -24,4 +23,13 @@ export class AuthController {
     profile(@Req() req: any) {
         return req.user;
   }
+
+    @UseGuards(JwtAuthGuard)
+    @Get('validate')
+    validate(@Req() req: any) {
+        return {
+            valid: true,
+            user: req.user,
+        };
+    }
 }

@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { Strategy } from 'passport-jwt';
+import { Strategy, ExtractJwt } from 'passport-jwt';
 
 const jwtSecret = process.env.JWT_SECRET ?? 'dev-secret-change-me';
 
@@ -8,29 +8,20 @@ const jwtSecret = process.env.JWT_SECRET ?? 'dev-secret-change-me';
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor() {
     super({
-      jwtFromRequest: (req) => {
-        const authHeader = req.headers.authorization;
-
-        if (!authHeader) {
-          return null;
-        }
-
-        const [type, token] = authHeader.split(' ');
-
-        if (type !== 'Bearer') {
-          return null;
-        }
-
-        return token;
-      },
-
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ignoreExpiration: false,
       secretOrKey: jwtSecret,
     });
   }
 
   validate(payload: any) {
+    if (!payload || !payload.email) {
+      throw new UnauthorizedException();
+    }
+
     return {
       email: payload.email,
+      name: payload.name,
     };
   }
 }
