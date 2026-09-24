@@ -18,7 +18,7 @@ import type {
 } from '@prisma/orm-mongo/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'257a761786f29ac935010968597eb4bddb0bb0bd0850b86e028e68f752fc2d74'>;
+  StorageHashBase<'89e7fcb1eb8c6a3d2a7dff30b0e72deda09bc539fa8fe73ed029776376df9f79'>;
 export type ExecutionHash = ExecutionHashBase<string>;
 export type ProfileHash =
   ProfileHashBase<'251b3ce23f6c9f561892e7c1af9d2cc941a13d64ba1aa7226b90036b09568cc3'>;
@@ -38,6 +38,10 @@ export type FieldOutputTypes = {
       readonly email: CodecTypes['mongo/string@1']['output'];
       readonly name: CodecTypes['mongo/string@1']['output'];
       readonly passwordHash: CodecTypes['mongo/string@1']['output'];
+      readonly bio: CodecTypes['mongo/string@1']['output'] | null;
+      readonly gen: CodecTypes['mongo/string@1']['output'] | null;
+      readonly image: CodecTypes['mongo/string@1']['output'] | null;
+      readonly permissao: CodecTypes['mongo/string@1']['output'] | null;
     };
   };
 };
@@ -54,6 +58,10 @@ export type FieldInputTypes = {
       readonly email: CodecTypes['mongo/string@1']['input'];
       readonly name: CodecTypes['mongo/string@1']['input'];
       readonly passwordHash: CodecTypes['mongo/string@1']['input'];
+      readonly bio: CodecTypes['mongo/string@1']['input'] | null;
+      readonly gen: CodecTypes['mongo/string@1']['input'] | null;
+      readonly image: CodecTypes['mongo/string@1']['input'] | null;
+      readonly permissao: CodecTypes['mongo/string@1']['input'] | null;
     };
   };
 };
@@ -64,6 +72,10 @@ export namespace Models {
     email: CodecTypes['mongo/string@1']['output'];
     name: CodecTypes['mongo/string@1']['output'];
     passwordHash: CodecTypes['mongo/string@1']['output'];
+    bio: CodecTypes['mongo/string@1']['output'] | null;
+    gen: CodecTypes['mongo/string@1']['output'] | null;
+    image: CodecTypes['mongo/string@1']['output'] | null;
+    permissao: CodecTypes['mongo/string@1']['output'] | null;
     posts: unbound_Post[];
     readonly [RelationKeys]?: 'posts';
   };
@@ -131,6 +143,10 @@ type ContractBase = Omit<
                     readonly email: { readonly bsonType: 'string' };
                     readonly name: { readonly bsonType: 'string' };
                     readonly passwordHash: { readonly bsonType: 'string' };
+                    readonly bio: { readonly bsonType: readonly ['null', 'string'] };
+                    readonly gen: { readonly bsonType: readonly ['null', 'string'] };
+                    readonly image: { readonly bsonType: readonly ['null', 'string'] };
+                    readonly permissao: { readonly bsonType: readonly ['null', 'string'] };
                   };
                   readonly additionalProperties: false;
                   readonly required: readonly ['_id', 'email', 'name', 'passwordHash'];
@@ -208,6 +224,22 @@ type ContractBase = Omit<
               };
               readonly passwordHash: {
                 readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/string@1' };
+              };
+              readonly bio: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/string@1' };
+              };
+              readonly gen: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/string@1' };
+              };
+              readonly image: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/string@1' };
+              };
+              readonly permissao: {
+                readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/string@1' };
               };
             };

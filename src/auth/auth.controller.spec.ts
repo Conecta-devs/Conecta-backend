@@ -17,6 +17,7 @@ describe('AuthController', () => {
           useValue: {
             register: vi.fn(),
             login: vi.fn(),
+            edit: vi.fn(),
           },
         },
       ],
@@ -27,5 +28,21 @@ describe('AuthController', () => {
 
   it('should be defined', () => {
     expect(controller).toBeDefined();
+  });
+
+  it('should call authService.edit when update profile route is used', async () => {
+    const dto = {
+      name: 'Maria',
+      bio: 'Dev front-end',
+      gen: 'feminino',
+      image: 'https://example.com/avatar.png',
+      permissao: 'usuario',
+    };
+
+    const req = { user: { email: 'maria@email.com' } };
+
+    await controller.edit(req, dto);
+
+    expect(controller['authService'].edit).toHaveBeenCalledWith(req.user.email, dto);
   });
 });

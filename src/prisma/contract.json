@@ -79,8 +79,29 @@
                   "kind": "scalar"
                 }
               },
+              "bio": {
+                "nullable": true,
+                "type": {
+                  "codecId": "mongo/string@1",
+                  "kind": "scalar"
+                }
+              },
               "email": {
                 "nullable": false,
+                "type": {
+                  "codecId": "mongo/string@1",
+                  "kind": "scalar"
+                }
+              },
+              "gen": {
+                "nullable": true,
+                "type": {
+                  "codecId": "mongo/string@1",
+                  "kind": "scalar"
+                }
+              },
+              "image": {
+                "nullable": true,
                 "type": {
                   "codecId": "mongo/string@1",
                   "kind": "scalar"
@@ -95,6 +116,13 @@
               },
               "passwordHash": {
                 "nullable": false,
+                "type": {
+                  "codecId": "mongo/string@1",
+                  "kind": "scalar"
+                }
+              },
+              "permissao": {
+                "nullable": true,
                 "type": {
                   "codecId": "mongo/string@1",
                   "kind": "scalar"
@@ -187,14 +215,38 @@
                     "_id": {
                       "bsonType": "objectId"
                     },
+                    "bio": {
+                      "bsonType": [
+                        "null",
+                        "string"
+                      ]
+                    },
                     "email": {
                       "bsonType": "string"
+                    },
+                    "gen": {
+                      "bsonType": [
+                        "null",
+                        "string"
+                      ]
+                    },
+                    "image": {
+                      "bsonType": [
+                        "null",
+                        "string"
+                      ]
                     },
                     "name": {
                       "bsonType": "string"
                     },
                     "passwordHash": {
                       "bsonType": "string"
+                    },
+                    "permissao": {
+                      "bsonType": [
+                        "null",
+                        "string"
+                      ]
                     }
                   },
                   "required": [
@@ -215,7 +267,7 @@
         "kind": "mongo-database"
       }
     },
-    "storageHash": "257a761786f29ac935010968597eb4bddb0bb0bd0850b86e028e68f752fc2d74"
+    "storageHash": "89e7fcb1eb8c6a3d2a7dff30b0e72deda09bc539fa8fe73ed029776376df9f79"
   },
   "capabilities": {},
   "extensions": {},
