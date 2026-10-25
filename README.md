@@ -18,12 +18,13 @@ O backend é responsável pela autenticação, regras de negócio e persistênci
 | Rotas protegidas por JWT | ✅ |
 | Validação dos DTOs | ✅ |
 | Refresh Token | ✅ |
-| CRUD de posts/assuntos | ⬜ |
+| CRUD de posts/assuntos | ✅ |
 | Grupos de estudo | ⬜ |
+| Chat | | ⬜ |
 | Mentorias | ⬜ |
 | API de eventos e rodas de conversa | ✅ |
-| Página da Agenda no frontend | ⬜ |
-| Integração com o frontend | ⬜ |
+| Página da Agenda no frontend | ✅ |
+| Integração com o frontend | ✅ |
 
 > O projeto está em desenvolvimento. As funcionalidades marcadas como ⬜ ainda não foram implementadas.
 
