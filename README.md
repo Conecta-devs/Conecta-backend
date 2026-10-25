@@ -20,7 +20,7 @@ O backend é responsável pela autenticação, regras de negócio e persistênci
 | Refresh Token | ✅ |
 | CRUD de posts/assuntos | ✅ |
 | Grupos de estudo | ⬜ |
-| Chat | | ⬜ |
+| Chat  | ⬜ |
 | Mentorias | ⬜ |
 | API de eventos e rodas de conversa | ✅ |
 | Página da Agenda no frontend | ✅ |
