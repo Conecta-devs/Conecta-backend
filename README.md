@@ -17,11 +17,12 @@ O backend é responsável pela autenticação, regras de negócio e persistênci
 | Login com JWT | ✅ |
 | Rotas protegidas por JWT | ✅ |
 | Validação dos DTOs | ✅ |
-| Refresh Token | ⬜ |
+| Refresh Token | ✅ |
 | CRUD de posts/assuntos | ⬜ |
 | Grupos de estudo | ⬜ |
 | Mentorias | ⬜ |
-| Eventos e rodas de conversa | ⬜ |
+| API de eventos e rodas de conversa | ✅ |
+| Página da Agenda no frontend | ⬜ |
 | Integração com o frontend | ⬜ |
 
 > O projeto está em desenvolvimento. As funcionalidades marcadas como ⬜ ainda não foram implementadas.
@@ -38,6 +39,7 @@ O backend é responsável pela autenticação, regras de negócio e persistênci
 - **MongoDB** — MongoDB Atlas é recomendado
 - **JWT** + **Passport**
 - **bcrypt**
+- **@nestjs/throttler** para limitar solicitações de recuperação
 - **class-validator** + **class-transformer**
 - **Vitest** + **Supertest**
 - **Oxlint**
@@ -114,6 +116,11 @@ PORT=3000
 | `DATABASE_URL` | ✅ | URL de conexão com o MongoDB | — |
 | `JWT_SECRET` | ✅ | Segredo utilizado para assinar os JWTs | — |
 | `PORT` | ❌ | Porta HTTP da API | `3000` |
+| `AUTH_ALLOWED_ORIGINS` | ❌ | Origens explícitas permitidas para CORS e autenticação por cookie, separadas por vírgula | Mesma origem da requisição |
+| `AUTH_COOKIE_SAME_SITE` | ❌ | Política SameSite do cookie de refresh (`lax` ou `none`; `none` exige HTTPS em produção) | `lax` |
+| `RESEND_API_KEY` | ✅ para recuperação | Chave privada usada pelo backend para enviar e-mails pelo Resend | — |
+| `RESEND_FROM_EMAIL` | ✅ para recuperação | Remetente autorizado/verificado no Resend | — |
+| `FRONTEND_URL` | ✅ em produção | URL-base usada para montar o link `/reset-password`; produção exige HTTPS | `http://localhost:5173` fora de produção |
 
 > 🔐 **Nunca coloque credenciais reais no repositório.**  
 > O arquivo `.env` deve permanecer ignorado pelo Git.
@@ -248,7 +255,7 @@ JWT
 Rotas protegidas
 ```
 
-Os tokens de acesso atualmente possuem validade de **15 minutos**.
+Os tokens de acesso possuem validade de **15 minutos**. O refresh token opaco é enviado somente em cookie `HttpOnly`, armazenado no banco apenas como hash e tem validade de **7 dias**. A renovação rotaciona o token; o anterior deixa de ser aceito.
 
 ---
 
@@ -296,7 +303,7 @@ POST /auth/login
 }
 ```
 
-O login retorna um `accessToken`.
+O login retorna um `accessToken` e define o cookie `conecta_refresh` com caminho `/api/auth`. O navegador não consegue ler esse cookie via JavaScript.
 
 Exemplo de resposta:
 
@@ -309,6 +316,34 @@ Exemplo de resposta:
   }
 }
 ```
+
+As operações `POST /auth/login`, `POST /auth/refresh` e `POST /auth/logout` exigem os headers `Origin` e `X-CSRF-Protection: 1`. O backend valida a origem da requisição. Como o frontend acessa a API pelo proxy same-origin `/api`, o padrão do cookie é `SameSite=Lax`. Em uma implantação cross-site, configure `AUTH_ALLOWED_ORIGINS` e `AUTH_COOKIE_SAME_SITE=none` com HTTPS.
+
+## ♻️ Renovação e logout
+
+### `POST /auth/refresh`
+
+Recebe o refresh token pelo cookie e retorna um novo access token e os dados do usuário. O cookie de refresh é substituído após a rotação ser confirmada.
+
+### `POST /auth/logout`
+
+Revoga a sessão associada ao cookie atual, limpa o cookie e responde `204 No Content`. A revogação do refresh token não invalida access tokens já emitidos; eles permanecem válidos até expirarem.
+
+## 🔐 Recuperação de senha
+
+### `POST /auth/forgot-password`
+
+Recebe `{ "email": "usuario@example.com" }` e responde `202 Accepted` com uma mensagem genérica, sem aguardar o provedor e sem revelar se a conta existe pela resposta. Quando a conta existe, um token aleatório de uso único é enviado ao e-mail; o banco armazena somente seu hash SHA-256. Tokens anteriores são substituídos e o token expira em 30 minutos. Falhas de entrega não expõem informações do provedor nem confirmam o envio ao cliente. O envio ocorre em memória e não é uma fila durável; uma parada do processo pode interrompê-lo.
+
+### `POST /auth/reset-password`
+
+Recebe `{ "token": "<token recebido por e-mail>", "password": "<nova senha>" }`. A senha precisa ter pelo menos 8 caracteres. O token expirado, inválido ou já consumido é rejeitado; após o consumo bem-sucedido, sessões de refresh existentes são revogadas e a senha é armazenada com bcrypt, como no cadastro.
+
+Ambos os endpoints são limitados a 5 requisições por minuto pelo IP observado pelo Express e por instância do backend. O armazenamento padrão do limitador é em memória; em produção com múltiplas réplicas, configure um armazenamento compartilhado para que o limite seja efetivamente global. O projeto não configura atualmente `trust proxy`; atrás de um proxy reverso, as requisições podem compartilhar o IP do proxy até que a confiança nos encaminhamentos seja configurada explicitamente e com segurança.
+
+Configure `RESEND_API_KEY`, `RESEND_FROM_EMAIL` e, em produção, `FRONTEND_URL` antes de aceitar solicitações. O endereço remetente precisa pertencer a um domínio verificado no Resend. O backend não executa testes de entrega real automaticamente. A página `/reset-password` precisa existir no frontend para concluir o fluxo.
+
+A coleção mantém um registro por usuário e a expiração é verificada pela aplicação; não há limpeza automática por TTL. O contrato define índices únicos para `userId` e `tokenHash`, mas a emissão do contrato não os aplica no MongoDB: o ambiente deve aplicar o contrato e confirmar esses índices antes de depender da unicidade em produção. Esta implementação não executou sincronização do banco. O consumo do token é condicionado em um único documento MongoDB. A atualização da senha incrementa `authVersion` por compare-and-set no documento do usuário; o refresh rejeita sessões com uma versão antiga, inclusive sessões criadas por um login concorrente que tenha lido a versão anterior. A revogação explícita das sessões continua sendo uma operação separada, sem transação multi-documento nesta arquitetura. Se uma etapa falhar depois do consumo, o usuário poderá precisar solicitar outro link. Access JWTs já emitidos não são revogados por essa operação e permanecem válidos até expirarem.
 
 ---
 
@@ -333,6 +368,27 @@ GET /auth/profile
 Essa rota exige um JWT válido.
 
 O backend utiliza a estratégia Passport JWT para validar o token e disponibilizar os dados do usuário autenticado.
+
+---
+
+## 📅 Agenda de encontros
+
+Todas as rotas abaixo exigem autenticação JWT. O organizador é definido pelo `sub` do token autenticado; `organizerId` não é aceito no corpo.
+
+| Método | Rota | Regra |
+|---|---|---|
+| `GET` | `/agenda` | Lista encontros não cancelados por data de início crescente. |
+| `GET` | `/agenda/:id` | Consulta um encontro ativo; IDs inválidos retornam `400` e encontros inexistentes ou cancelados retornam `404`. |
+| `POST` | `/agenda` | Cria um evento (`kind: event`) ou roda de conversa (`kind: conversation`). |
+| `PATCH` | `/agenda/:id` | Edita somente encontro ativo do próprio organizador. |
+| `PATCH` | `/agenda/:id/cancel` | Cancela logicamente encontro ativo do próprio organizador. |
+| `GET` | `/agenda/:id/participation/me` | Consulta somente a participação do usuário autenticado. |
+| `PUT` | `/agenda/:id/participation/interest` | Define o interesse com `{ "interested": true }` ou `{ "interested": false }`. |
+| `PUT` | `/agenda/:id/participation/attendance` | Define a presença com `{ "confirmed": true }` ou `{ "confirmed": false }`. |
+
+`format` aceita `online` ou `in_person`. Encontros presenciais exigem `location` e não aceitam `meetingUrl`; encontros online não aceitam `location`, e `meetingUrl` é opcional. Datas devem ser ISO-8601 com fuso explícito e o término deve ser posterior ao início. Encontros cancelados não aparecem na listagem nem na consulta por ID e não podem ser editados ou cancelados novamente.
+
+Se ainda não houver uma participação, o endpoint `GET` retorna `interested: false` e `confirmed: false` sem criar documento. As duas operações `PUT` atualizam somente seu próprio booleano. O upsert usa a chave composta declarada no contrato; a proteção contra duplicatas concorrentes depende de o índice único correspondente estar realmente aplicado no MongoDB, o que deve ser verificado antes de assumir essa garantia.
 
 ---
 

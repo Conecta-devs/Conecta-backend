@@ -4,22 +4,24 @@ import { AuthController } from './auth.controller.js';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt-strategy/jwt-strategy.js';
-
-const jwtSecret = process.env.JWT_SECRET ?? 'dev-secret-change-me';
+import { getJwtSecret } from './jwt-secret.js';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { ResendEmailService } from './resend-email.service.js';
 
 @Module({
   imports: [
     PassportModule.register({
       defaultStrategy: 'jwt',
     }),
+    ThrottlerModule.forRoot([{ ttl: 60_000, limit: 5 }]),
     JwtModule.register({
-      secret: jwtSecret,
+      secret: getJwtSecret(),
       signOptions: {
         expiresIn: '15m',
       },
     }),
   ],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtStrategy, ResendEmailService],
   controllers: [AuthController],
 })
 export class AuthModule {}
