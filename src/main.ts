@@ -2,11 +2,22 @@ import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule, ObserveInstrument } from './app.module.js';
 import { ValidationPipe } from '@nestjs/common';
+import { getConfiguredAuthOrigins } from './auth/session-cookie.js';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     instrument: ObserveInstrument,
   });
+
+  const authOrigins = getConfiguredAuthOrigins();
+  if (authOrigins.length > 0) {
+    app.enableCors({
+      origin: authOrigins,
+      credentials: true,
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Protection'],
+      methods: ['GET', 'POST', 'PUT', 'PATCH', 'OPTIONS'],
+    });
+  }
 
   app.useGlobalPipes(
     new ValidationPipe({

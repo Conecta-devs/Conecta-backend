@@ -18,7 +18,7 @@ import type {
 } from '@prisma/orm-mongo/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'89e7fcb1eb8c6a3d2a7dff30b0e72deda09bc539fa8fe73ed029776376df9f79'>;
+  StorageHashBase<'aff8b097fb36df8d3d26022fe7eec9bfb0c8c97ec35006d41b0b491d2b58d598'>;
 export type ExecutionHash = ExecutionHashBase<string>;
 export type ProfileHash =
   ProfileHashBase<'251b3ce23f6c9f561892e7c1af9d2cc941a13d64ba1aa7226b90036b09568cc3'>;
@@ -27,11 +27,50 @@ export type CodecTypes = MongoCodecTypes;
 
 export type FieldOutputTypes = {
   readonly __unbound__: {
+    readonly AgendaItem: {
+      readonly _id: CodecTypes['mongo/objectId@1']['output'];
+      readonly title: CodecTypes['mongo/string@1']['output'];
+      readonly description: CodecTypes['mongo/string@1']['output'];
+      readonly kind: CodecTypes['mongo/string@1']['output'];
+      readonly format: CodecTypes['mongo/string@1']['output'];
+      readonly startsAt: CodecTypes['mongo/date@1']['output'];
+      readonly endsAt: CodecTypes['mongo/date@1']['output'];
+      readonly meetingUrl: CodecTypes['mongo/string@1']['output'] | null;
+      readonly location: CodecTypes['mongo/string@1']['output'] | null;
+      readonly organizerId: CodecTypes['mongo/objectId@1']['output'];
+      readonly cancelledAt: CodecTypes['mongo/date@1']['output'] | null;
+      readonly createdAt: CodecTypes['mongo/date@1']['output'];
+      readonly updatedAt: CodecTypes['mongo/date@1']['output'];
+    };
+    readonly AgendaParticipation: {
+      readonly _id: CodecTypes['mongo/objectId@1']['output'];
+      readonly agendaItemId: CodecTypes['mongo/objectId@1']['output'];
+      readonly userId: CodecTypes['mongo/objectId@1']['output'];
+      readonly interested: CodecTypes['mongo/bool@1']['output'];
+      readonly confirmed: CodecTypes['mongo/bool@1']['output'];
+      readonly createdAt: CodecTypes['mongo/date@1']['output'];
+      readonly updatedAt: CodecTypes['mongo/date@1']['output'];
+    };
+    readonly PasswordResetToken: {
+      readonly _id: CodecTypes['mongo/objectId@1']['output'];
+      readonly userId: CodecTypes['mongo/objectId@1']['output'];
+      readonly tokenHash: CodecTypes['mongo/string@1']['output'];
+      readonly expiresAt: CodecTypes['mongo/date@1']['output'];
+      readonly consumedAt: CodecTypes['mongo/date@1']['output'] | null;
+    };
     readonly Post: {
       readonly _id: CodecTypes['mongo/objectId@1']['output'];
       readonly title: CodecTypes['mongo/string@1']['output'];
       readonly content: CodecTypes['mongo/string@1']['output'] | null;
       readonly authorId: CodecTypes['mongo/objectId@1']['output'];
+    };
+    readonly Session: {
+      readonly _id: CodecTypes['mongo/objectId@1']['output'];
+      readonly userId: CodecTypes['mongo/objectId@1']['output'];
+      readonly tokenHash: CodecTypes['mongo/string@1']['output'];
+      readonly expiresAt: CodecTypes['mongo/date@1']['output'];
+      readonly revokedAt: CodecTypes['mongo/date@1']['output'] | null;
+      readonly authVersion: CodecTypes['mongo/int32@1']['output'] | null;
     };
     readonly User: {
       readonly _id: CodecTypes['mongo/objectId@1']['output'];
@@ -42,16 +81,56 @@ export type FieldOutputTypes = {
       readonly gen: CodecTypes['mongo/string@1']['output'] | null;
       readonly image: CodecTypes['mongo/string@1']['output'] | null;
       readonly permissao: CodecTypes['mongo/string@1']['output'] | null;
+      readonly authVersion: CodecTypes['mongo/int32@1']['output'] | null;
     };
   };
 };
 export type FieldInputTypes = {
   readonly __unbound__: {
+    readonly AgendaItem: {
+      readonly _id: CodecTypes['mongo/objectId@1']['input'];
+      readonly title: CodecTypes['mongo/string@1']['input'];
+      readonly description: CodecTypes['mongo/string@1']['input'];
+      readonly kind: CodecTypes['mongo/string@1']['input'];
+      readonly format: CodecTypes['mongo/string@1']['input'];
+      readonly startsAt: CodecTypes['mongo/date@1']['input'];
+      readonly endsAt: CodecTypes['mongo/date@1']['input'];
+      readonly meetingUrl: CodecTypes['mongo/string@1']['input'] | null;
+      readonly location: CodecTypes['mongo/string@1']['input'] | null;
+      readonly organizerId: CodecTypes['mongo/objectId@1']['input'];
+      readonly cancelledAt: CodecTypes['mongo/date@1']['input'] | null;
+      readonly createdAt: CodecTypes['mongo/date@1']['input'];
+      readonly updatedAt: CodecTypes['mongo/date@1']['input'];
+    };
+    readonly AgendaParticipation: {
+      readonly _id: CodecTypes['mongo/objectId@1']['input'];
+      readonly agendaItemId: CodecTypes['mongo/objectId@1']['input'];
+      readonly userId: CodecTypes['mongo/objectId@1']['input'];
+      readonly interested: CodecTypes['mongo/bool@1']['input'];
+      readonly confirmed: CodecTypes['mongo/bool@1']['input'];
+      readonly createdAt: CodecTypes['mongo/date@1']['input'];
+      readonly updatedAt: CodecTypes['mongo/date@1']['input'];
+    };
+    readonly PasswordResetToken: {
+      readonly _id: CodecTypes['mongo/objectId@1']['input'];
+      readonly userId: CodecTypes['mongo/objectId@1']['input'];
+      readonly tokenHash: CodecTypes['mongo/string@1']['input'];
+      readonly expiresAt: CodecTypes['mongo/date@1']['input'];
+      readonly consumedAt: CodecTypes['mongo/date@1']['input'] | null;
+    };
     readonly Post: {
       readonly _id: CodecTypes['mongo/objectId@1']['input'];
       readonly title: CodecTypes['mongo/string@1']['input'];
       readonly content: CodecTypes['mongo/string@1']['input'] | null;
       readonly authorId: CodecTypes['mongo/objectId@1']['input'];
+    };
+    readonly Session: {
+      readonly _id: CodecTypes['mongo/objectId@1']['input'];
+      readonly userId: CodecTypes['mongo/objectId@1']['input'];
+      readonly tokenHash: CodecTypes['mongo/string@1']['input'];
+      readonly expiresAt: CodecTypes['mongo/date@1']['input'];
+      readonly revokedAt: CodecTypes['mongo/date@1']['input'] | null;
+      readonly authVersion: CodecTypes['mongo/int32@1']['input'] | null;
     };
     readonly User: {
       readonly _id: CodecTypes['mongo/objectId@1']['input'];
@@ -62,6 +141,7 @@ export type FieldInputTypes = {
       readonly gen: CodecTypes['mongo/string@1']['input'] | null;
       readonly image: CodecTypes['mongo/string@1']['input'] | null;
       readonly permissao: CodecTypes['mongo/string@1']['input'] | null;
+      readonly authVersion: CodecTypes['mongo/int32@1']['input'] | null;
     };
   };
 };
@@ -76,8 +156,14 @@ export namespace Models {
     gen: CodecTypes['mongo/string@1']['output'] | null;
     image: CodecTypes['mongo/string@1']['output'] | null;
     permissao: CodecTypes['mongo/string@1']['output'] | null;
+    authVersion: CodecTypes['mongo/int32@1']['output'] | null;
     posts: unbound_Post[];
-    readonly [RelationKeys]?: 'posts';
+    sessions: unbound_Session[];
+    passwordResetToken: unbound_PasswordResetToken | null;
+    organizedAgendaItems: unbound_AgendaItem[];
+    agendaParticipations: unbound_AgendaParticipation[];
+    readonly [RelationKeys]?:
+      'posts' | 'sessions' | 'passwordResetToken' | 'organizedAgendaItems' | 'agendaParticipations';
   };
   export type unbound_Post = {
     _id: CodecTypes['mongo/objectId@1']['output'];
@@ -87,12 +173,65 @@ export namespace Models {
     author: unbound_User;
     readonly [RelationKeys]?: 'author';
   };
+  export type unbound_Session = {
+    _id: CodecTypes['mongo/objectId@1']['output'];
+    userId: CodecTypes['mongo/objectId@1']['output'];
+    tokenHash: CodecTypes['mongo/string@1']['output'];
+    expiresAt: CodecTypes['mongo/date@1']['output'];
+    revokedAt: CodecTypes['mongo/date@1']['output'] | null;
+    authVersion: CodecTypes['mongo/int32@1']['output'] | null;
+    user: unbound_User;
+    readonly [RelationKeys]?: 'user';
+  };
+  export type unbound_PasswordResetToken = {
+    _id: CodecTypes['mongo/objectId@1']['output'];
+    userId: CodecTypes['mongo/objectId@1']['output'];
+    tokenHash: CodecTypes['mongo/string@1']['output'];
+    expiresAt: CodecTypes['mongo/date@1']['output'];
+    consumedAt: CodecTypes['mongo/date@1']['output'] | null;
+    user: unbound_User;
+    readonly [RelationKeys]?: 'user';
+  };
+  export type unbound_AgendaItem = {
+    _id: CodecTypes['mongo/objectId@1']['output'];
+    title: CodecTypes['mongo/string@1']['output'];
+    description: CodecTypes['mongo/string@1']['output'];
+    kind: CodecTypes['mongo/string@1']['output'];
+    format: CodecTypes['mongo/string@1']['output'];
+    startsAt: CodecTypes['mongo/date@1']['output'];
+    endsAt: CodecTypes['mongo/date@1']['output'];
+    meetingUrl: CodecTypes['mongo/string@1']['output'] | null;
+    location: CodecTypes['mongo/string@1']['output'] | null;
+    organizerId: CodecTypes['mongo/objectId@1']['output'];
+    cancelledAt: CodecTypes['mongo/date@1']['output'] | null;
+    createdAt: CodecTypes['mongo/date@1']['output'];
+    updatedAt: CodecTypes['mongo/date@1']['output'];
+    organizer: unbound_User;
+    participations: unbound_AgendaParticipation[];
+    readonly [RelationKeys]?: 'organizer' | 'participations';
+  };
+  export type unbound_AgendaParticipation = {
+    _id: CodecTypes['mongo/objectId@1']['output'];
+    agendaItemId: CodecTypes['mongo/objectId@1']['output'];
+    userId: CodecTypes['mongo/objectId@1']['output'];
+    interested: CodecTypes['mongo/bool@1']['output'];
+    confirmed: CodecTypes['mongo/bool@1']['output'];
+    createdAt: CodecTypes['mongo/date@1']['output'];
+    updatedAt: CodecTypes['mongo/date@1']['output'];
+    agendaItem: unbound_AgendaItem;
+    user: unbound_User;
+    readonly [RelationKeys]?: 'agendaItem' | 'user';
+  };
 }
 
 export declare const models: {
   __unbound__: {
     User: Models.unbound_User;
     Post: Models.unbound_Post;
+    Session: Models.unbound_Session;
+    PasswordResetToken: Models.unbound_PasswordResetToken;
+    AgendaItem: Models.unbound_AgendaItem;
+    AgendaParticipation: Models.unbound_AgendaParticipation;
   };
 };
 
@@ -106,6 +245,117 @@ type ContractBase = Omit<
         readonly kind: 'mongo-database';
         readonly entries: {
           readonly collection: {
+            readonly agenda_items: {
+              readonly kind: 'mongo-collection';
+              readonly validator: {
+                readonly kind: 'mongo-validator';
+                readonly jsonSchema: {
+                  readonly bsonType: 'object';
+                  readonly properties: {
+                    readonly _id: { readonly bsonType: 'objectId' };
+                    readonly title: { readonly bsonType: 'string' };
+                    readonly description: { readonly bsonType: 'string' };
+                    readonly kind: { readonly bsonType: 'string' };
+                    readonly format: { readonly bsonType: 'string' };
+                    readonly startsAt: { readonly bsonType: 'date' };
+                    readonly endsAt: { readonly bsonType: 'date' };
+                    readonly meetingUrl: { readonly bsonType: readonly ['null', 'string'] };
+                    readonly location: { readonly bsonType: readonly ['null', 'string'] };
+                    readonly organizerId: { readonly bsonType: 'objectId' };
+                    readonly cancelledAt: { readonly bsonType: readonly ['null', 'date'] };
+                    readonly createdAt: { readonly bsonType: 'date' };
+                    readonly updatedAt: { readonly bsonType: 'date' };
+                  };
+                  readonly additionalProperties: false;
+                  readonly required: readonly [
+                    '_id',
+                    'createdAt',
+                    'description',
+                    'endsAt',
+                    'format',
+                    'kind',
+                    'organizerId',
+                    'startsAt',
+                    'title',
+                    'updatedAt',
+                  ];
+                };
+                readonly validationLevel: 'strict';
+                readonly validationAction: 'error';
+              };
+            };
+            readonly agenda_participations: {
+              readonly kind: 'mongo-collection';
+              readonly indexes: readonly [
+                {
+                  readonly kind: 'mongo-index';
+                  readonly keys: readonly [
+                    { readonly field: 'agendaItemId'; readonly direction: 1 },
+                    { readonly field: 'userId'; readonly direction: 1 },
+                  ];
+                  readonly unique: true;
+                },
+              ];
+              readonly validator: {
+                readonly kind: 'mongo-validator';
+                readonly jsonSchema: {
+                  readonly bsonType: 'object';
+                  readonly properties: {
+                    readonly _id: { readonly bsonType: 'objectId' };
+                    readonly agendaItemId: { readonly bsonType: 'objectId' };
+                    readonly userId: { readonly bsonType: 'objectId' };
+                    readonly interested: { readonly bsonType: 'bool' };
+                    readonly confirmed: { readonly bsonType: 'bool' };
+                    readonly createdAt: { readonly bsonType: 'date' };
+                    readonly updatedAt: { readonly bsonType: 'date' };
+                  };
+                  readonly additionalProperties: false;
+                  readonly required: readonly [
+                    '_id',
+                    'agendaItemId',
+                    'confirmed',
+                    'createdAt',
+                    'interested',
+                    'updatedAt',
+                    'userId',
+                  ];
+                };
+                readonly validationLevel: 'strict';
+                readonly validationAction: 'error';
+              };
+            };
+            readonly password_reset_tokens: {
+              readonly kind: 'mongo-collection';
+              readonly indexes: readonly [
+                {
+                  readonly kind: 'mongo-index';
+                  readonly keys: readonly [{ readonly field: 'userId'; readonly direction: 1 }];
+                  readonly unique: true;
+                },
+                {
+                  readonly kind: 'mongo-index';
+                  readonly keys: readonly [{ readonly field: 'tokenHash'; readonly direction: 1 }];
+                  readonly unique: true;
+                },
+              ];
+              readonly validator: {
+                readonly kind: 'mongo-validator';
+                readonly jsonSchema: {
+                  readonly bsonType: 'object';
+                  readonly properties: {
+                    readonly _id: { readonly bsonType: 'objectId' };
+                    readonly userId: { readonly bsonType: 'objectId' };
+                    readonly tokenHash: { readonly bsonType: 'string' };
+                    readonly expiresAt: { readonly bsonType: 'date' };
+                    readonly consumedAt: { readonly bsonType: readonly ['null', 'date'] };
+                  };
+                  readonly additionalProperties: false;
+                  readonly required: readonly ['_id', 'expiresAt', 'tokenHash', 'userId'];
+                };
+                readonly validationLevel: 'strict';
+                readonly validationAction: 'error';
+              };
+            };
             readonly posts: {
               readonly kind: 'mongo-collection';
               readonly validator: {
@@ -120,6 +370,34 @@ type ContractBase = Omit<
                   };
                   readonly additionalProperties: false;
                   readonly required: readonly ['_id', 'authorId', 'title'];
+                };
+                readonly validationLevel: 'strict';
+                readonly validationAction: 'error';
+              };
+            };
+            readonly sessions: {
+              readonly kind: 'mongo-collection';
+              readonly indexes: readonly [
+                {
+                  readonly kind: 'mongo-index';
+                  readonly keys: readonly [{ readonly field: 'tokenHash'; readonly direction: 1 }];
+                  readonly unique: true;
+                },
+              ];
+              readonly validator: {
+                readonly kind: 'mongo-validator';
+                readonly jsonSchema: {
+                  readonly bsonType: 'object';
+                  readonly properties: {
+                    readonly _id: { readonly bsonType: 'objectId' };
+                    readonly userId: { readonly bsonType: 'objectId' };
+                    readonly tokenHash: { readonly bsonType: 'string' };
+                    readonly expiresAt: { readonly bsonType: 'date' };
+                    readonly revokedAt: { readonly bsonType: readonly ['null', 'date'] };
+                    readonly authVersion: { readonly bsonType: readonly ['null', 'int'] };
+                  };
+                  readonly additionalProperties: false;
+                  readonly required: readonly ['_id', 'expiresAt', 'tokenHash', 'userId'];
                 };
                 readonly validationLevel: 'strict';
                 readonly validationAction: 'error';
@@ -147,6 +425,7 @@ type ContractBase = Omit<
                     readonly gen: { readonly bsonType: readonly ['null', 'string'] };
                     readonly image: { readonly bsonType: readonly ['null', 'string'] };
                     readonly permissao: { readonly bsonType: readonly ['null', 'string'] };
+                    readonly authVersion: { readonly bsonType: readonly ['null', 'int'] };
                   };
                   readonly additionalProperties: false;
                   readonly required: readonly ['_id', 'email', 'name', 'passwordHash'];
@@ -168,11 +447,207 @@ type ContractBase = Omit<
   readonly roots: {
     readonly users: { readonly namespace: '__unbound__' & NamespaceId; readonly model: 'User' };
     readonly posts: { readonly namespace: '__unbound__' & NamespaceId; readonly model: 'Post' };
+    readonly sessions: {
+      readonly namespace: '__unbound__' & NamespaceId;
+      readonly model: 'Session';
+    };
+    readonly password_reset_tokens: {
+      readonly namespace: '__unbound__' & NamespaceId;
+      readonly model: 'PasswordResetToken';
+    };
+    readonly agenda_items: {
+      readonly namespace: '__unbound__' & NamespaceId;
+      readonly model: 'AgendaItem';
+    };
+    readonly agenda_participations: {
+      readonly namespace: '__unbound__' & NamespaceId;
+      readonly model: 'AgendaParticipation';
+    };
   };
   readonly domain: {
     readonly namespaces: {
       readonly __unbound__: {
         readonly models: {
+          readonly AgendaItem: {
+            readonly fields: {
+              readonly _id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/objectId@1' };
+              };
+              readonly title: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/string@1' };
+              };
+              readonly description: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/string@1' };
+              };
+              readonly kind: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/string@1' };
+              };
+              readonly format: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/string@1' };
+              };
+              readonly startsAt: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/date@1' };
+              };
+              readonly endsAt: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/date@1' };
+              };
+              readonly meetingUrl: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/string@1' };
+              };
+              readonly location: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/string@1' };
+              };
+              readonly organizerId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/objectId@1' };
+              };
+              readonly cancelledAt: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/date@1' };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/date@1' };
+              };
+              readonly updatedAt: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/date@1' };
+              };
+            };
+            readonly relations: {
+              readonly organizer: {
+                readonly to: {
+                  readonly namespace: '__unbound__' & NamespaceId;
+                  readonly model: 'User';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['organizerId'];
+                  readonly targetFields: readonly ['_id'];
+                };
+              };
+              readonly participations: {
+                readonly to: {
+                  readonly namespace: '__unbound__' & NamespaceId;
+                  readonly model: 'AgendaParticipation';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['_id'];
+                  readonly targetFields: readonly ['agendaItemId'];
+                };
+              };
+            };
+            readonly storage: { readonly collection: 'agenda_items' };
+          };
+          readonly AgendaParticipation: {
+            readonly fields: {
+              readonly _id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/objectId@1' };
+              };
+              readonly agendaItemId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/objectId@1' };
+              };
+              readonly userId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/objectId@1' };
+              };
+              readonly interested: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/bool@1' };
+              };
+              readonly confirmed: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/bool@1' };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/date@1' };
+              };
+              readonly updatedAt: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/date@1' };
+              };
+            };
+            readonly relations: {
+              readonly agendaItem: {
+                readonly to: {
+                  readonly namespace: '__unbound__' & NamespaceId;
+                  readonly model: 'AgendaItem';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['agendaItemId'];
+                  readonly targetFields: readonly ['_id'];
+                };
+              };
+              readonly user: {
+                readonly to: {
+                  readonly namespace: '__unbound__' & NamespaceId;
+                  readonly model: 'User';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['userId'];
+                  readonly targetFields: readonly ['_id'];
+                };
+              };
+            };
+            readonly storage: { readonly collection: 'agenda_participations' };
+          };
+          readonly PasswordResetToken: {
+            readonly fields: {
+              readonly _id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/objectId@1' };
+              };
+              readonly userId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/objectId@1' };
+              };
+              readonly tokenHash: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/string@1' };
+              };
+              readonly expiresAt: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/date@1' };
+              };
+              readonly consumedAt: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/date@1' };
+              };
+            };
+            readonly relations: {
+              readonly user: {
+                readonly to: {
+                  readonly namespace: '__unbound__' & NamespaceId;
+                  readonly model: 'User';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['userId'];
+                  readonly targetFields: readonly ['_id'];
+                };
+              };
+            };
+            readonly storage: { readonly collection: 'password_reset_tokens' };
+          };
           readonly Post: {
             readonly fields: {
               readonly _id: {
@@ -208,6 +683,49 @@ type ContractBase = Omit<
             };
             readonly storage: { readonly collection: 'posts' };
           };
+          readonly Session: {
+            readonly fields: {
+              readonly _id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/objectId@1' };
+              };
+              readonly userId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/objectId@1' };
+              };
+              readonly tokenHash: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/string@1' };
+              };
+              readonly expiresAt: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/date@1' };
+              };
+              readonly revokedAt: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/date@1' };
+              };
+              readonly authVersion: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/int32@1' };
+              };
+            };
+            readonly relations: {
+              readonly user: {
+                readonly to: {
+                  readonly namespace: '__unbound__' & NamespaceId;
+                  readonly model: 'User';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['userId'];
+                  readonly targetFields: readonly ['_id'];
+                };
+              };
+            };
+            readonly storage: { readonly collection: 'sessions' };
+          };
           readonly User: {
             readonly fields: {
               readonly _id: {
@@ -242,6 +760,10 @@ type ContractBase = Omit<
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/string@1' };
               };
+              readonly authVersion: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/int32@1' };
+              };
             };
             readonly relations: {
               readonly posts: {
@@ -253,6 +775,51 @@ type ContractBase = Omit<
                 readonly on: {
                   readonly localFields: readonly ['_id'];
                   readonly targetFields: readonly ['authorId'];
+                };
+              };
+              readonly sessions: {
+                readonly to: {
+                  readonly namespace: '__unbound__' & NamespaceId;
+                  readonly model: 'Session';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['_id'];
+                  readonly targetFields: readonly ['userId'];
+                };
+              };
+              readonly passwordResetToken: {
+                readonly to: {
+                  readonly namespace: '__unbound__' & NamespaceId;
+                  readonly model: 'PasswordResetToken';
+                };
+                readonly cardinality: '1:1';
+                readonly nullable: true;
+                readonly on: {
+                  readonly localFields: readonly ['_id'];
+                  readonly targetFields: readonly ['userId'];
+                };
+              };
+              readonly organizedAgendaItems: {
+                readonly to: {
+                  readonly namespace: '__unbound__' & NamespaceId;
+                  readonly model: 'AgendaItem';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['_id'];
+                  readonly targetFields: readonly ['organizerId'];
+                };
+              };
+              readonly agendaParticipations: {
+                readonly to: {
+                  readonly namespace: '__unbound__' & NamespaceId;
+                  readonly model: 'AgendaParticipation';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['_id'];
+                  readonly targetFields: readonly ['userId'];
                 };
               };
             };

@@ -9,7 +9,12 @@ model User {
   gen          String?
   image        String?
   permissao    String?
+  authVersion  Int?
   posts        Post[]
+  sessions     Session[]
+  passwordResetToken PasswordResetToken?
+  organizedAgendaItems AgendaItem[]
+  agendaParticipations AgendaParticipation[]
 
   @@map("users")
 }
@@ -22,4 +27,62 @@ model Post {
   authorId ObjectId
 
   @@map("posts")
+}
+
+model Session {
+  id        ObjectId @id @map("_id")
+  userId    ObjectId
+  user      User     @relation(fields: [userId], references: [id])
+  tokenHash String   @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  authVersion Int?
+
+  @@map("sessions")
+}
+
+model PasswordResetToken {
+  id        ObjectId @id @map("_id")
+  userId    ObjectId @unique
+  user      User     @relation(fields: [userId], references: [id])
+  tokenHash String   @unique
+  expiresAt DateTime
+  consumedAt DateTime?
+
+  @@map("password_reset_tokens")
+}
+
+model AgendaItem {
+  id              ObjectId @id @map("_id")
+  title           String
+  description     String
+  kind            String
+  format          String
+  startsAt        DateTime
+  endsAt          DateTime
+  meetingUrl      String?
+  location        String?
+  organizerId     ObjectId
+  organizer       User     @relation(fields: [organizerId], references: [id])
+  cancelledAt     DateTime?
+  createdAt       DateTime
+  updatedAt       DateTime
+  participations  AgendaParticipation[]
+
+  @@map("agenda_items")
+}
+
+model AgendaParticipation {
+  id            ObjectId  @id @map("_id")
+  agendaItemId  ObjectId
+  agendaItem    AgendaItem @relation(fields: [agendaItemId], references: [id])
+  userId        ObjectId
+  user          User      @relation(fields: [userId], references: [id])
+  interested    Boolean
+  confirmed     Boolean
+  createdAt     DateTime
+  updatedAt     DateTime
+
+  @@unique([agendaItemId, userId])
+  @@map("agenda_participations")
 }
