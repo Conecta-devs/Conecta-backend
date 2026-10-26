@@ -19,9 +19,8 @@ O backend é responsável pela autenticação, regras de negócio e persistênci
 | Validação dos DTOs | ✅ |
 | Refresh Token | ✅ |
 | CRUD de posts/assuntos | ✅ |
-| Grupos de estudo | ⬜ |
+| Grupos de estudo/comunidades| ⬜ |
 | Chat  | ⬜ |
-| Mentorias | ⬜ |
 | API de eventos e rodas de conversa | ✅ |
 | Página da Agenda no frontend | ✅ |
 | Integração com o frontend | ✅ |
