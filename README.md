@@ -8,22 +8,22 @@ O backend é responsável pela autenticação, regras de negócio e persistênci
 
 ## 📌 Status do projeto
 
-| Funcionalidade | Status |
-|---|:---:|
-| Estrutura inicial com NestJS | ✅ |
-| Integração com MongoDB | ✅ |
-| Prisma + MongoDB | ✅ |
-| Cadastro de usuários | ✅ |
-| Login com JWT | ✅ |
-| Rotas protegidas por JWT | ✅ |
-| Validação dos DTOs | ✅ |
-| Refresh Token | ✅ |
-| CRUD de posts/assuntos | ✅ |
-| Grupos de estudo/comunidades| ⬜ |
-| Chat  | ⬜ |
-| API de eventos e rodas de conversa | ✅ |
-| Página da Agenda no frontend | ✅ |
-| Integração com o frontend | ✅ |
+| Funcionalidade                     | Status |
+| ---------------------------------- | :----: |
+| Estrutura inicial com NestJS       |   ✅   |
+| Integração com MongoDB             |   ✅   |
+| Prisma + MongoDB                   |   ✅   |
+| Cadastro de usuários               |   ✅   |
+| Login com JWT                      |   ✅   |
+| Rotas protegidas por JWT           |   ✅   |
+| Validação dos DTOs                 |   ✅   |
+| Refresh Token                      |   ✅   |
+| CRUD de posts/assuntos             |   ✅   |
+| Grupos de estudo/comunidades       |   ⬜   |
+| Chat                               |   ✅   |
+| API de eventos e rodas de conversa |   ✅   |
+| Página da Agenda no frontend       |   ✅   |
+| Integração com o frontend          |   ✅   |
 
 > O projeto está em desenvolvimento. As funcionalidades marcadas como ⬜ ainda não foram implementadas.
 
@@ -39,7 +39,7 @@ O backend é responsável pela autenticação, regras de negócio e persistênci
 - **MongoDB** — MongoDB Atlas é recomendado
 - **JWT** + **Passport**
 - **bcrypt**
-- **@nestjs/throttler** para limitar solicitações de recuperação
+- **@nestjs/throttler** para limitar solicitações de recuperação e envios HTTP do chat
 - **class-validator** + **class-transformer**
 - **Vitest** + **Supertest**
 - **Oxlint**
@@ -111,16 +111,16 @@ PORT=3000
 
 ### Variáveis disponíveis
 
-| Variável | Obrigatória | Descrição | Padrão |
-|---|:---:|---|---|
-| `DATABASE_URL` | ✅ | URL de conexão com o MongoDB | — |
-| `JWT_SECRET` | ✅ | Segredo utilizado para assinar os JWTs | — |
-| `PORT` | ❌ | Porta HTTP da API | `3000` |
-| `AUTH_ALLOWED_ORIGINS` | ❌ | Origens explícitas permitidas para CORS e autenticação por cookie, separadas por vírgula | Mesma origem da requisição |
-| `AUTH_COOKIE_SAME_SITE` | ❌ | Política SameSite do cookie de refresh (`lax` ou `none`; `none` exige HTTPS em produção) | `lax` |
-| `RESEND_API_KEY` | ✅ para recuperação | Chave privada usada pelo backend para enviar e-mails pelo Resend | — |
-| `RESEND_FROM_EMAIL` | ✅ para recuperação | Remetente autorizado/verificado no Resend | — |
-| `FRONTEND_URL` | ✅ em produção | URL-base usada para montar o link `/reset-password`; produção exige HTTPS | `http://localhost:5173` fora de produção |
+| Variável                |     Obrigatória     | Descrição                                                                                | Padrão                                   |
+| ----------------------- | :-----------------: | ---------------------------------------------------------------------------------------- | ---------------------------------------- |
+| `DATABASE_URL`          |         ✅          | URL de conexão com o MongoDB                                                             | —                                        |
+| `JWT_SECRET`            |         ✅          | Segredo utilizado para assinar os JWTs                                                   | —                                        |
+| `PORT`                  |         ❌          | Porta HTTP da API                                                                        | `3000`                                   |
+| `AUTH_ALLOWED_ORIGINS`  |         ❌          | Origens explícitas permitidas para CORS e autenticação por cookie, separadas por vírgula | Mesma origem da requisição               |
+| `AUTH_COOKIE_SAME_SITE` |         ❌          | Política SameSite do cookie de refresh (`lax` ou `none`; `none` exige HTTPS em produção) | `lax`                                    |
+| `RESEND_API_KEY`        | ✅ para recuperação | Chave privada usada pelo backend para enviar e-mails pelo Resend                         | —                                        |
+| `RESEND_FROM_EMAIL`     | ✅ para recuperação | Remetente autorizado/verificado no Resend                                                | —                                        |
+| `FRONTEND_URL`          |   ✅ em produção    | URL-base usada para montar o link `/reset-password`; produção exige HTTPS                | `http://localhost:5173` fora de produção |
 
 > 🔐 **Nunca coloque credenciais reais no repositório.**  
 > O arquivo `.env` deve permanecer ignorado pelo Git.
@@ -375,18 +375,93 @@ O backend utiliza a estratégia Passport JWT para validar o token e disponibiliz
 
 Todas as rotas abaixo exigem autenticação JWT. O organizador é definido pelo `sub` do token autenticado; `organizerId` não é aceito no corpo.
 
-| Método | Rota | Regra |
-|---|---|---|
-| `GET` | `/agenda` | Lista encontros não cancelados por data de início crescente. |
-| `GET` | `/agenda/:id` | Consulta um encontro ativo; IDs inválidos retornam `400` e encontros inexistentes ou cancelados retornam `404`. |
-| `POST` | `/agenda` | Cria um evento (`kind: event`) ou roda de conversa (`kind: conversation`). |
-| `PATCH` | `/agenda/:id` | Edita somente encontro ativo do próprio organizador. |
-| `PATCH` | `/agenda/:id/cancel` | Cancela logicamente encontro ativo do próprio organizador. |
-| `GET` | `/agenda/:id/participation/me` | Consulta somente a participação do usuário autenticado. |
-| `PUT` | `/agenda/:id/participation/interest` | Define o interesse com `{ "interested": true }` ou `{ "interested": false }`. |
-| `PUT` | `/agenda/:id/participation/attendance` | Define a presença com `{ "confirmed": true }` ou `{ "confirmed": false }`. |
+| Método  | Rota                                   | Regra                                                                                                           |
+| ------- | -------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `GET`   | `/agenda`                              | Lista encontros não cancelados por data de início crescente.                                                    |
+| `GET`   | `/agenda/:id`                          | Consulta um encontro ativo; IDs inválidos retornam `400` e encontros inexistentes ou cancelados retornam `404`. |
+| `POST`  | `/agenda`                              | Cria um evento (`kind: event`) ou roda de conversa (`kind: conversation`).                                      |
+| `PATCH` | `/agenda/:id`                          | Edita somente encontro ativo do próprio organizador.                                                            |
+| `PATCH` | `/agenda/:id/cancel`                   | Cancela logicamente encontro ativo do próprio organizador.                                                      |
+| `GET`   | `/agenda/:id/participation/me`         | Consulta somente a participação do usuário autenticado.                                                         |
+| `PUT`   | `/agenda/:id/participation/interest`   | Define o interesse com `{ "interested": true }` ou `{ "interested": false }`.                                   |
+| `PUT`   | `/agenda/:id/participation/attendance` | Define a presença com `{ "confirmed": true }` ou `{ "confirmed": false }`.                                      |
 
 `format` aceita `online` ou `in_person`. Encontros presenciais exigem `location` e não aceitam `meetingUrl`; encontros online não aceitam `location`, e `meetingUrl` é opcional. Datas devem ser ISO-8601 com fuso explícito e o término deve ser posterior ao início. Encontros cancelados não aparecem na listagem nem na consulta por ID e não podem ser editados ou cancelados novamente.
+
+## 💬 Chat
+
+O chat utiliza o mesmo JWT de acesso Bearer das rotas HTTP e a persistência Prisma/MongoDB existente. O access token dura 15 minutos; cookies de refresh não autenticam sockets. As rotas HTTP abaixo exigem autenticação JWT.
+
+### Regras de conversas e mensagens
+
+- Conversas individuais são recuperadas de forma idempotente para o mesmo par de IDs; a criação usa um `_id` determinístico no MongoDB.
+- O criador é o único administrador do grupo. Somente ele pode adicionar/remover membros; qualquer membro pode sair pela rota de saída. Quando o administrador sai, o membro restante mais antigo assume a administração atomicamente. O grupo deve manter ao menos um membro.
+- Novos membros começam a leitura na sequência atual da conversa, sem contar o histórico anterior à entrada.
+- A sequência da conversa fornece ordenação estável e cursores de histórico. O histórico retorna mensagens em ordem crescente e `nextCursor` aponta para a próxima página mais antiga.
+- Cada membro tem `lastReadSequence`. Uma mensagem é considerada lida por ele quando sua sequência é menor ou igual a esse cursor. Mensagens próprias não entram na contagem de não lidas; recebimento/entrega não equivale a leitura.
+- `clientMessageId` deve ser UUID v4. O mesmo identificador para a mesma conversa/remetente é idempotente em reenvios.
+- Conteúdo é texto simples após `trim`, obrigatório, e limitado a 4.000 caracteres. O remetente é sempre derivado do JWT.
+
+### Endpoints
+
+| Método   | Rota                                                                      | Entrada / resultado                                                                                                                                                                                                                           |
+| -------- | ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `GET`    | `/chat/users?search=<prefixo>&page=1&limit=24`                            | Lista usuários disponíveis para iniciar conversas; retorna apenas `id`, `name` e `image`, excluindo o usuário autenticado. `search` pesquisa o prefixo do nome (o modelo não possui username); página padrão 1, limite padrão 24 e máximo 50. |
+| `GET`    | `/chat/conversations`                                                     | Lista até 50 conversas do usuário com membros, última mensagem e contagem não lida.                                                                                                                                                           |
+| `POST`   | `/chat/conversations/direct`                                              | `{ "participantId": "<ObjectId>" }`; cria ou recupera conversa individual.                                                                                                                                                                    |
+| `POST`   | `/chat/conversations/groups`                                              | `{ "name": "Grupo", "memberIds": ["<ObjectId>"] }`; o criador é incluído como administrador; até 50 membros no total.                                                                                                                         |
+| `GET`    | `/chat/conversations/:conversationId`                                     | Metadados e membros de uma conversa autorizada, papel do usuário e contagem não lida.                                                                                                                                                         |
+| `GET`    | `/chat/conversations/:conversationId/messages?before=<sequence>&limit=50` | Histórico paginado; `limit` padrão 50 e máximo 100. `before` é uma sequência inteira exclusiva.                                                                                                                                               |
+| `POST`   | `/chat/conversations/:conversationId/messages`                            | `{ "clientMessageId": "<UUID v4>", "content": "..." }`; persiste antes de emitir eventos. Limitado a 30 solicitações por minuto e IP/instância.                                                                                               |
+| `POST`   | `/chat/conversations/:conversationId/read`                                | Avança o cursor de leitura até a sequência observada pelo servidor e retorna o total não lido restante.                                                                                                                                       |
+| `POST`   | `/chat/conversations/:conversationId/members`                             | `{ "memberIds": ["<ObjectId>"] }`; somente administrador.                                                                                                                                                                                     |
+| `DELETE` | `/chat/conversations/:conversationId/members/:memberId`                   | Remove outro membro; somente administrador.                                                                                                                                                                                                   |
+| `POST`   | `/chat/conversations/:conversationId/leave`                               | O usuário autenticado deixa um grupo.                                                                                                                                                                                                         |
+
+IDs são strings MongoDB ObjectId de 24 caracteres hexadecimais; datas são ISO-8601 em JSON. Erros HTTP seguem o formato NestJS (`statusCode`, `message`, `error`). IDs de conversas inexistentes e conversas alheias retornam `404` sem revelar sua existência.
+
+A descoberta de usuários usa o índice `users.name` e uma pesquisa de prefixo escapada, ordenada/paginada no MongoDB. O campo `username` não existe no modelo atual; o endpoint não pesquisa nem retorna e-mail, hash de senha, permissões ou dados de sessão.
+
+`GET /chat/users` responde diretamente, sem envelope global, com `{ "users": [{ "id": "...", "name": "...", "image": null }], "page": 1, "limit": 24, "hasMore": false }`. `users` é sempre um array; cada entrada expõe somente `id`, `name` e `image`, e `image` é `null` quando não há imagem cadastrada. Os metadados de paginação são números/booleanos JSON.
+
+A migração aditiva `migrations/app/20261026T2251_user_name_search_index_after_chat` cria o índice `name_1`. Revise o estado do banco e o grafo de migrações no ambiente de destino antes de aplicá-la; esta alteração não foi aplicada ao MongoDB Atlas durante o desenvolvimento.
+
+### Socket.IO
+
+Conecte ao namespace padrão do servidor Socket.IO com o access token em `auth: { token: accessToken }`; também é aceito `Authorization: Bearer <accessToken>` no handshake. Não envie token em query string. A conexão é validada com o JwtService/Passport e usa a expiração e a chave existentes. Origem é limitada a `AUTH_ALLOWED_ORIGINS`; se não definida, conexões de navegador ficam restritas à mesma origem.
+
+O cliente deve entrar em cada sala após autenticar:
+
+| Evento cliente            | Payload                                                                         | Confirmação                                                                                                                                                                     |
+| ------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `chat:conversation:join`  | `{ "conversationId": "<ObjectId>" }`                                            | `{ "ok": true, "data": { "conversationId": "...", "joined": true } }`; exige participação ativa.                                                                                |
+| `chat:conversation:leave` | `{ "conversationId": "<ObjectId>" }`                                            | `{ "ok": true, "data": { "conversationId": "...", "left": true } }`.                                                                                                            |
+| `chat:message:send`       | `{ "conversationId": "...", "clientMessageId": "<UUID v4>", "content": "..." }` | `{ "ok": true, "data": <mensagem persistida> }`; erro: `{ "ok": false, "error": { "statusCode": 400, "message": "..." } }`. Limite de 20 envios/minuto por usuário e instância. |
+| `chat:message:read`       | `{ "conversationId": "<ObjectId>" }`                                            | `{ "ok": true, "data": { "conversationId": "...", "lastReadSequence": 12, "unreadCount": 0 } }`.                                                                                |
+
+Eventos do servidor:
+
+| Evento                        | Destinatários                  | Payload                                                                                                             |
+| ----------------------------- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------- |
+| `chat:message:new`            | Sala autorizada da conversa    | Mensagem já persistida (`id`, `conversationId`, `senderId`, `sequence`, `clientMessageId`, `content`, `createdAt`). |
+| `chat:conversation:update`    | Sala da conversa               | Metadados da conversa e última mensagem.                                                                            |
+| `chat:unread:update`          | Sessões autenticadas do membro | `{ "conversationId": "...", "unreadCount": 2 }`.                                                                    |
+| `chat:message:read`           | Sala da conversa               | `{ "conversationId": "...", "userId": "...", "lastReadSequence": 12, "unreadCount": 0 }`.                           |
+| `chat:conversation:available` | Sessões dos membros            | `{ "conversationId": "..." }`; indica que a lista pode ser atualizada.                                              |
+| `chat:conversation:members`   | Sala da conversa               | `{ "conversationId": "...", "memberIds": ["..."] }`.                                                                |
+| `chat:conversation:removed`   | Sessões do membro removido     | `{ "conversationId": "..." }`; as sessões também são removidas da sala.                                             |
+
+Uma confirmação positiva de envio significa que a mensagem foi persistida. Não representa entrega a outro dispositivo nem leitura. Em reconexão, autentique novamente, busque o histórico via HTTP e entre de novo nas salas necessárias. Os limites atuais são em memória e por instância; uma implantação com várias réplicas precisa de armazenamento compartilhado para limites e de um adaptador Socket.IO (por exemplo Redis) para propagar eventos entre instâncias.
+
+### Configuração e índices MongoDB
+
+Copie `.env.example` para `.env` e configure `DATABASE_URL` com a URI Atlas, `JWT_SECRET` e as origens reais do navegador. `DATABASE_URL` permanece somente no backend. O contrato adiciona as coleções `chat_conversations`, `chat_members` e `chat_messages`, com índices de consulta, sequência e idempotência.
+
+O bundle formal de migração contém um baseline `null → contrato pré-chat` e uma migração `contrato pré-chat → chat`. **Não aplique esse baseline a um banco já populado.** O Atlas existente tem um marcador e objetos legados que não correspondem ao grafo atual; `db update` também pode propor mudanças nos validadores/índices antigos e remover `groups`. Para preparar apenas as coleções do chat sem tocar nesses objetos, execute `npm run mongo:chat:setup`. O script aplica exclusivamente a criação de `chat_conversations`, `chat_members` e `chat_messages`, seus validadores na criação e os quatro índices definidos no bundle de chat. Ele não remove nem altera coleções existentes. A execução é repetível; se uma coleção de chat já existir, preserva seu validador atual e garante os índices esperados.
+
+Esse procedimento aditivo direto não atualiza o marcador Prisma nem reconcilia o grafo de migrações. Portanto, `db verify`/`db migrate --show` ainda podem reportar divergências do marcador ou do esquema legado. **Não execute `db update`, `db migrate` ou `db sign` para tentar corrigir isso** até o baseline ser reconciliado e o plano completo revisado. As operações de grupo abrangem várias coleções e não são uma transação multi-documento.
+
+O projeto não configura adaptador Redis. A autenticação Socket.IO, autorização de salas e histórico HTTP permanecem no backend; o front-end deve atualizar sua lista/contagens ao receber os eventos acima.
 
 Se ainda não houver uma participação, o endpoint `GET` retorna `interested: false` e `confirmed: false` sem criar documento. As duas operações `PUT` atualizam somente seu próprio booleano. O upsert usa a chave composta declarada no contrato; a proteção contra duplicatas concorrentes depende de o índice único correspondente estar realmente aplicado no MongoDB, o que deve ser verificado antes de assumir essa garantia.
 
@@ -482,16 +557,16 @@ conecta-backend/
 
 ### Principais responsabilidades
 
-| Arquivo/Pasta | Responsabilidade |
-|---|---|
-| `auth/` | Autenticação e autorização |
-| `dto/` | Validação dos dados recebidos pela API |
-| `jwt-auth/` | Guard para proteção de rotas |
-| `jwt-strategy/` | Estratégia de autenticação JWT |
-| `prisma/` | Contrato e acesso ao MongoDB |
-| `main.ts` | Inicialização da aplicação e configurações globais |
-| `app.module.ts` | Módulo principal do NestJS |
-| `test/` | Testes da aplicação |
+| Arquivo/Pasta   | Responsabilidade                                   |
+| --------------- | -------------------------------------------------- |
+| `auth/`         | Autenticação e autorização                         |
+| `dto/`          | Validação dos dados recebidos pela API             |
+| `jwt-auth/`     | Guard para proteção de rotas                       |
+| `jwt-strategy/` | Estratégia de autenticação JWT                     |
+| `prisma/`       | Contrato e acesso ao MongoDB                       |
+| `main.ts`       | Inicialização da aplicação e configurações globais |
+| `app.module.ts` | Módulo principal do NestJS                         |
+| `test/`         | Testes da aplicação                                |
 
 ---
 
@@ -619,14 +694,14 @@ chore: atualiza dependências
 
 Tipos mais utilizados:
 
-| Tipo | Uso |
-|---|---|
-| `feat` | Nova funcionalidade |
-| `fix` | Correção de bug |
-| `test` | Testes |
-| `docs` | Documentação |
-| `refactor` | Refatoração |
-| `chore` | Manutenção/configuração |
+| Tipo       | Uso                     |
+| ---------- | ----------------------- |
+| `feat`     | Nova funcionalidade     |
+| `fix`      | Correção de bug         |
+| `test`     | Testes                  |
+| `docs`     | Documentação            |
+| `refactor` | Refatoração             |
+| `chore`    | Manutenção/configuração |
 
 ---
 
@@ -660,12 +735,12 @@ Para compartilhar configurações com a equipe, utilize `.env.example` **sem cre
 
 # 👥 Equipe
 
-| Integrante |
-|---|
-| Kauan Matheus Martins |
+| Integrante                |
+| ------------------------- |
+| Kauan Matheus Martins     |
 | Matheus Alexandre Pereira |
-| Matheus Marra Barbosa |
-| Mike Ensergueix |
+| Matheus Marra Barbosa     |
+| Mike Ensergueix           |
 
 ---
 
