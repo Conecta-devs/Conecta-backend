@@ -255,6 +255,21 @@ describe('AuthService password recovery', () => {
     });
   });
 
+  it('returns the generic response when the email service is not configured', async () => {
+    mailer.assertConfigured.mockImplementation(() => {
+      throw new Error('service unavailable');
+    });
+
+    await expect(
+      service.requestPasswordReset({ email: 'user@example.com' }),
+    ).resolves.toEqual({
+      message:
+        'Se o endereço estiver cadastrado, será possível solicitar a redefinição da senha.',
+    });
+    expect(state.resetTokens).toHaveLength(1);
+    expect(mailer.sendPasswordReset).not.toHaveBeenCalled();
+  });
+
   it('does not wait for email delivery before returning the generic response', async () => {
     mailer.sendPasswordReset.mockReturnValue(new Promise(() => {}));
 
