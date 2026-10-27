@@ -1,0 +1,59 @@
+[
+  {
+    "id": "index.users.create(name:1)",
+    "label": "Create index on users (name:1)",
+    "operationClass": "additive",
+    "precheck": [
+      {
+        "description": "index does not already exist on users",
+        "source": {
+          "kind": "listIndexes",
+          "collection": "users"
+        },
+        "filter": {
+          "kind": "field",
+          "field": "key",
+          "op": "$eq",
+          "value": {
+            "name": 1
+          }
+        },
+        "expect": "notExists"
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index on users",
+        "command": {
+          "kind": "createIndex",
+          "collection": "users",
+          "keys": [
+            {
+              "direction": 1,
+              "field": "name"
+            }
+          ],
+          "name": "name_1"
+        }
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "index exists on users",
+        "source": {
+          "kind": "listIndexes",
+          "collection": "users"
+        },
+        "filter": {
+          "kind": "field",
+          "field": "key",
+          "op": "$eq",
+          "value": {
+            "name": 1
+          }
+        },
+        "expect": "exists"
+      }
+    ]
+  }
+]

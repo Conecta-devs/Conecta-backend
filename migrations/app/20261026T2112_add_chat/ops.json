@@ -1,0 +1,542 @@
+[
+  {
+    "id": "collection.chat_conversations.create",
+    "label": "Create collection chat_conversations",
+    "operationClass": "additive",
+    "precheck": [
+      {
+        "description": "collection chat_conversations does not exist",
+        "source": {
+          "kind": "listCollections"
+        },
+        "filter": {
+          "kind": "field",
+          "field": "name",
+          "op": "$eq",
+          "value": "chat_conversations"
+        },
+        "expect": "notExists"
+      }
+    ],
+    "execute": [
+      {
+        "description": "create collection chat_conversations",
+        "command": {
+          "kind": "createCollection",
+          "collection": "chat_conversations",
+          "validator": {
+            "$jsonSchema": {
+              "additionalProperties": false,
+              "bsonType": "object",
+              "properties": {
+                "_id": {
+                  "bsonType": "objectId"
+                },
+                "adminUserId": {
+                  "bsonType": [
+                    "null",
+                    "objectId"
+                  ]
+                },
+                "createdAt": {
+                  "bsonType": "date"
+                },
+                "createdBy": {
+                  "bsonType": "objectId"
+                },
+                "directKey": {
+                  "bsonType": [
+                    "null",
+                    "string"
+                  ]
+                },
+                "kind": {
+                  "bsonType": "string"
+                },
+                "lastMessageAt": {
+                  "bsonType": [
+                    "null",
+                    "date"
+                  ]
+                },
+                "lastMessageContent": {
+                  "bsonType": [
+                    "null",
+                    "string"
+                  ]
+                },
+                "lastMessageSenderId": {
+                  "bsonType": [
+                    "null",
+                    "objectId"
+                  ]
+                },
+                "lastMessageSequence": {
+                  "bsonType": "int"
+                },
+                "sequence": {
+                  "bsonType": "int"
+                },
+                "title": {
+                  "bsonType": [
+                    "null",
+                    "string"
+                  ]
+                },
+                "updatedAt": {
+                  "bsonType": "date"
+                }
+              },
+              "required": [
+                "_id",
+                "createdAt",
+                "createdBy",
+                "kind",
+                "lastMessageSequence",
+                "sequence",
+                "updatedAt"
+              ]
+            }
+          },
+          "validationLevel": "strict",
+          "validationAction": "error"
+        }
+      }
+    ],
+    "postcheck": []
+  },
+  {
+    "id": "collection.chat_members.create",
+    "label": "Create collection chat_members",
+    "operationClass": "additive",
+    "precheck": [
+      {
+        "description": "collection chat_members does not exist",
+        "source": {
+          "kind": "listCollections"
+        },
+        "filter": {
+          "kind": "field",
+          "field": "name",
+          "op": "$eq",
+          "value": "chat_members"
+        },
+        "expect": "notExists"
+      }
+    ],
+    "execute": [
+      {
+        "description": "create collection chat_members",
+        "command": {
+          "kind": "createCollection",
+          "collection": "chat_members",
+          "validator": {
+            "$jsonSchema": {
+              "additionalProperties": false,
+              "bsonType": "object",
+              "properties": {
+                "_id": {
+                  "bsonType": "objectId"
+                },
+                "conversationId": {
+                  "bsonType": "objectId"
+                },
+                "joinedAt": {
+                  "bsonType": "date"
+                },
+                "lastActivityAt": {
+                  "bsonType": "date"
+                },
+                "lastActivitySequence": {
+                  "bsonType": "int"
+                },
+                "lastReadSequence": {
+                  "bsonType": "int"
+                },
+                "userId": {
+                  "bsonType": "objectId"
+                }
+              },
+              "required": [
+                "_id",
+                "conversationId",
+                "joinedAt",
+                "lastActivityAt",
+                "lastActivitySequence",
+                "lastReadSequence",
+                "userId"
+              ]
+            }
+          },
+          "validationLevel": "strict",
+          "validationAction": "error"
+        }
+      }
+    ],
+    "postcheck": []
+  },
+  {
+    "id": "collection.chat_messages.create",
+    "label": "Create collection chat_messages",
+    "operationClass": "additive",
+    "precheck": [
+      {
+        "description": "collection chat_messages does not exist",
+        "source": {
+          "kind": "listCollections"
+        },
+        "filter": {
+          "kind": "field",
+          "field": "name",
+          "op": "$eq",
+          "value": "chat_messages"
+        },
+        "expect": "notExists"
+      }
+    ],
+    "execute": [
+      {
+        "description": "create collection chat_messages",
+        "command": {
+          "kind": "createCollection",
+          "collection": "chat_messages",
+          "validator": {
+            "$jsonSchema": {
+              "additionalProperties": false,
+              "bsonType": "object",
+              "properties": {
+                "_id": {
+                  "bsonType": "objectId"
+                },
+                "clientMessageId": {
+                  "bsonType": "string"
+                },
+                "content": {
+                  "bsonType": "string"
+                },
+                "conversationId": {
+                  "bsonType": "objectId"
+                },
+                "createdAt": {
+                  "bsonType": "date"
+                },
+                "senderId": {
+                  "bsonType": "objectId"
+                },
+                "sequence": {
+                  "bsonType": "int"
+                }
+              },
+              "required": [
+                "_id",
+                "clientMessageId",
+                "content",
+                "conversationId",
+                "createdAt",
+                "senderId",
+                "sequence"
+              ]
+            }
+          },
+          "validationLevel": "strict",
+          "validationAction": "error"
+        }
+      }
+    ],
+    "postcheck": []
+  },
+  {
+    "id": "index.chat_members.create(conversationId:1,userId:1)",
+    "label": "Create index on chat_members (conversationId:1, userId:1)",
+    "operationClass": "additive",
+    "precheck": [
+      {
+        "description": "index does not already exist on chat_members",
+        "source": {
+          "kind": "listIndexes",
+          "collection": "chat_members"
+        },
+        "filter": {
+          "kind": "field",
+          "field": "key",
+          "op": "$eq",
+          "value": {
+            "conversationId": 1,
+            "userId": 1
+          }
+        },
+        "expect": "notExists"
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index on chat_members",
+        "command": {
+          "kind": "createIndex",
+          "collection": "chat_members",
+          "keys": [
+            {
+              "direction": 1,
+              "field": "conversationId"
+            },
+            {
+              "direction": 1,
+              "field": "userId"
+            }
+          ],
+          "unique": true,
+          "name": "conversationId_1_userId_1"
+        }
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "index exists on chat_members",
+        "source": {
+          "kind": "listIndexes",
+          "collection": "chat_members"
+        },
+        "filter": {
+          "kind": "and",
+          "exprs": [
+            {
+              "kind": "field",
+              "field": "key",
+              "op": "$eq",
+              "value": {
+                "conversationId": 1,
+                "userId": 1
+              }
+            },
+            {
+              "kind": "field",
+              "field": "unique",
+              "op": "$eq",
+              "value": true
+            }
+          ]
+        },
+        "expect": "exists"
+      }
+    ]
+  },
+  {
+    "id": "index.chat_members.create(userId:1,lastActivityAt:1)",
+    "label": "Create index on chat_members (userId:1, lastActivityAt:1)",
+    "operationClass": "additive",
+    "precheck": [
+      {
+        "description": "index does not already exist on chat_members",
+        "source": {
+          "kind": "listIndexes",
+          "collection": "chat_members"
+        },
+        "filter": {
+          "kind": "field",
+          "field": "key",
+          "op": "$eq",
+          "value": {
+            "userId": 1,
+            "lastActivityAt": 1
+          }
+        },
+        "expect": "notExists"
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index on chat_members",
+        "command": {
+          "kind": "createIndex",
+          "collection": "chat_members",
+          "keys": [
+            {
+              "direction": 1,
+              "field": "userId"
+            },
+            {
+              "direction": 1,
+              "field": "lastActivityAt"
+            }
+          ],
+          "name": "userId_1_lastActivityAt_1"
+        }
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "index exists on chat_members",
+        "source": {
+          "kind": "listIndexes",
+          "collection": "chat_members"
+        },
+        "filter": {
+          "kind": "field",
+          "field": "key",
+          "op": "$eq",
+          "value": {
+            "userId": 1,
+            "lastActivityAt": 1
+          }
+        },
+        "expect": "exists"
+      }
+    ]
+  },
+  {
+    "id": "index.chat_messages.create(conversationId:1,sequence:1)",
+    "label": "Create index on chat_messages (conversationId:1, sequence:1)",
+    "operationClass": "additive",
+    "precheck": [
+      {
+        "description": "index does not already exist on chat_messages",
+        "source": {
+          "kind": "listIndexes",
+          "collection": "chat_messages"
+        },
+        "filter": {
+          "kind": "field",
+          "field": "key",
+          "op": "$eq",
+          "value": {
+            "conversationId": 1,
+            "sequence": 1
+          }
+        },
+        "expect": "notExists"
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index on chat_messages",
+        "command": {
+          "kind": "createIndex",
+          "collection": "chat_messages",
+          "keys": [
+            {
+              "direction": 1,
+              "field": "conversationId"
+            },
+            {
+              "direction": 1,
+              "field": "sequence"
+            }
+          ],
+          "unique": true,
+          "name": "conversationId_1_sequence_1"
+        }
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "index exists on chat_messages",
+        "source": {
+          "kind": "listIndexes",
+          "collection": "chat_messages"
+        },
+        "filter": {
+          "kind": "and",
+          "exprs": [
+            {
+              "kind": "field",
+              "field": "key",
+              "op": "$eq",
+              "value": {
+                "conversationId": 1,
+                "sequence": 1
+              }
+            },
+            {
+              "kind": "field",
+              "field": "unique",
+              "op": "$eq",
+              "value": true
+            }
+          ]
+        },
+        "expect": "exists"
+      }
+    ]
+  },
+  {
+    "id": "index.chat_messages.create(conversationId:1,senderId:1,clientMessageId:1)",
+    "label": "Create index on chat_messages (conversationId:1, senderId:1, clientMessageId:1)",
+    "operationClass": "additive",
+    "precheck": [
+      {
+        "description": "index does not already exist on chat_messages",
+        "source": {
+          "kind": "listIndexes",
+          "collection": "chat_messages"
+        },
+        "filter": {
+          "kind": "field",
+          "field": "key",
+          "op": "$eq",
+          "value": {
+            "conversationId": 1,
+            "senderId": 1,
+            "clientMessageId": 1
+          }
+        },
+        "expect": "notExists"
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index on chat_messages",
+        "command": {
+          "kind": "createIndex",
+          "collection": "chat_messages",
+          "keys": [
+            {
+              "direction": 1,
+              "field": "conversationId"
+            },
+            {
+              "direction": 1,
+              "field": "senderId"
+            },
+            {
+              "direction": 1,
+              "field": "clientMessageId"
+            }
+          ],
+          "unique": true,
+          "name": "conversationId_1_senderId_1_clientMessageId_1"
+        }
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "index exists on chat_messages",
+        "source": {
+          "kind": "listIndexes",
+          "collection": "chat_messages"
+        },
+        "filter": {
+          "kind": "and",
+          "exprs": [
+            {
+              "kind": "field",
+              "field": "key",
+              "op": "$eq",
+              "value": {
+                "conversationId": 1,
+                "senderId": 1,
+                "clientMessageId": 1
+              }
+            },
+            {
+              "kind": "field",
+              "field": "unique",
+              "op": "$eq",
+              "value": true
+            }
+          ]
+        },
+        "expect": "exists"
+      }
+    ]
+  }
+]

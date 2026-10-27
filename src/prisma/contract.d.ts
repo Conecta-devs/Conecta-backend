@@ -18,7 +18,7 @@ import type {
 } from '@prisma/orm-mongo/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'aff8b097fb36df8d3d26022fe7eec9bfb0c8c97ec35006d41b0b491d2b58d598'>;
+  StorageHashBase<'44d6dbad48eb52c5a2907db6cf4b292a417e49f7621838386ffcc25973d6fb7d'>;
 export type ExecutionHash = ExecutionHashBase<string>;
 export type ProfileHash =
   ProfileHashBase<'251b3ce23f6c9f561892e7c1af9d2cc941a13d64ba1aa7226b90036b09568cc3'>;
@@ -50,6 +50,39 @@ export type FieldOutputTypes = {
       readonly confirmed: CodecTypes['mongo/bool@1']['output'];
       readonly createdAt: CodecTypes['mongo/date@1']['output'];
       readonly updatedAt: CodecTypes['mongo/date@1']['output'];
+    };
+    readonly ChatConversation: {
+      readonly _id: CodecTypes['mongo/objectId@1']['output'];
+      readonly kind: CodecTypes['mongo/string@1']['output'];
+      readonly title: CodecTypes['mongo/string@1']['output'] | null;
+      readonly directKey: CodecTypes['mongo/string@1']['output'] | null;
+      readonly createdBy: CodecTypes['mongo/objectId@1']['output'];
+      readonly adminUserId: CodecTypes['mongo/objectId@1']['output'] | null;
+      readonly sequence: CodecTypes['mongo/int32@1']['output'];
+      readonly lastMessageSequence: CodecTypes['mongo/int32@1']['output'];
+      readonly lastMessageContent: CodecTypes['mongo/string@1']['output'] | null;
+      readonly lastMessageSenderId: CodecTypes['mongo/objectId@1']['output'] | null;
+      readonly lastMessageAt: CodecTypes['mongo/date@1']['output'] | null;
+      readonly createdAt: CodecTypes['mongo/date@1']['output'];
+      readonly updatedAt: CodecTypes['mongo/date@1']['output'];
+    };
+    readonly ChatMember: {
+      readonly _id: CodecTypes['mongo/objectId@1']['output'];
+      readonly conversationId: CodecTypes['mongo/objectId@1']['output'];
+      readonly userId: CodecTypes['mongo/objectId@1']['output'];
+      readonly joinedAt: CodecTypes['mongo/date@1']['output'];
+      readonly lastActivityAt: CodecTypes['mongo/date@1']['output'];
+      readonly lastActivitySequence: CodecTypes['mongo/int32@1']['output'];
+      readonly lastReadSequence: CodecTypes['mongo/int32@1']['output'];
+    };
+    readonly ChatMessage: {
+      readonly _id: CodecTypes['mongo/objectId@1']['output'];
+      readonly conversationId: CodecTypes['mongo/objectId@1']['output'];
+      readonly senderId: CodecTypes['mongo/objectId@1']['output'];
+      readonly sequence: CodecTypes['mongo/int32@1']['output'];
+      readonly clientMessageId: CodecTypes['mongo/string@1']['output'];
+      readonly content: CodecTypes['mongo/string@1']['output'];
+      readonly createdAt: CodecTypes['mongo/date@1']['output'];
     };
     readonly PasswordResetToken: {
       readonly _id: CodecTypes['mongo/objectId@1']['output'];
@@ -110,6 +143,39 @@ export type FieldInputTypes = {
       readonly confirmed: CodecTypes['mongo/bool@1']['input'];
       readonly createdAt: CodecTypes['mongo/date@1']['input'];
       readonly updatedAt: CodecTypes['mongo/date@1']['input'];
+    };
+    readonly ChatConversation: {
+      readonly _id: CodecTypes['mongo/objectId@1']['input'];
+      readonly kind: CodecTypes['mongo/string@1']['input'];
+      readonly title: CodecTypes['mongo/string@1']['input'] | null;
+      readonly directKey: CodecTypes['mongo/string@1']['input'] | null;
+      readonly createdBy: CodecTypes['mongo/objectId@1']['input'];
+      readonly adminUserId: CodecTypes['mongo/objectId@1']['input'] | null;
+      readonly sequence: CodecTypes['mongo/int32@1']['input'];
+      readonly lastMessageSequence: CodecTypes['mongo/int32@1']['input'];
+      readonly lastMessageContent: CodecTypes['mongo/string@1']['input'] | null;
+      readonly lastMessageSenderId: CodecTypes['mongo/objectId@1']['input'] | null;
+      readonly lastMessageAt: CodecTypes['mongo/date@1']['input'] | null;
+      readonly createdAt: CodecTypes['mongo/date@1']['input'];
+      readonly updatedAt: CodecTypes['mongo/date@1']['input'];
+    };
+    readonly ChatMember: {
+      readonly _id: CodecTypes['mongo/objectId@1']['input'];
+      readonly conversationId: CodecTypes['mongo/objectId@1']['input'];
+      readonly userId: CodecTypes['mongo/objectId@1']['input'];
+      readonly joinedAt: CodecTypes['mongo/date@1']['input'];
+      readonly lastActivityAt: CodecTypes['mongo/date@1']['input'];
+      readonly lastActivitySequence: CodecTypes['mongo/int32@1']['input'];
+      readonly lastReadSequence: CodecTypes['mongo/int32@1']['input'];
+    };
+    readonly ChatMessage: {
+      readonly _id: CodecTypes['mongo/objectId@1']['input'];
+      readonly conversationId: CodecTypes['mongo/objectId@1']['input'];
+      readonly senderId: CodecTypes['mongo/objectId@1']['input'];
+      readonly sequence: CodecTypes['mongo/int32@1']['input'];
+      readonly clientMessageId: CodecTypes['mongo/string@1']['input'];
+      readonly content: CodecTypes['mongo/string@1']['input'];
+      readonly createdAt: CodecTypes['mongo/date@1']['input'];
     };
     readonly PasswordResetToken: {
       readonly _id: CodecTypes['mongo/objectId@1']['input'];
@@ -222,6 +288,42 @@ export namespace Models {
     user: unbound_User;
     readonly [RelationKeys]?: 'agendaItem' | 'user';
   };
+  export type unbound_ChatConversation = {
+    _id: CodecTypes['mongo/objectId@1']['output'];
+    kind: CodecTypes['mongo/string@1']['output'];
+    title: CodecTypes['mongo/string@1']['output'] | null;
+    directKey: CodecTypes['mongo/string@1']['output'] | null;
+    createdBy: CodecTypes['mongo/objectId@1']['output'];
+    adminUserId: CodecTypes['mongo/objectId@1']['output'] | null;
+    sequence: CodecTypes['mongo/int32@1']['output'];
+    lastMessageSequence: CodecTypes['mongo/int32@1']['output'];
+    lastMessageContent: CodecTypes['mongo/string@1']['output'] | null;
+    lastMessageSenderId: CodecTypes['mongo/objectId@1']['output'] | null;
+    lastMessageAt: CodecTypes['mongo/date@1']['output'] | null;
+    createdAt: CodecTypes['mongo/date@1']['output'];
+    updatedAt: CodecTypes['mongo/date@1']['output'];
+    readonly [RelationKeys]?: never;
+  };
+  export type unbound_ChatMember = {
+    _id: CodecTypes['mongo/objectId@1']['output'];
+    conversationId: CodecTypes['mongo/objectId@1']['output'];
+    userId: CodecTypes['mongo/objectId@1']['output'];
+    joinedAt: CodecTypes['mongo/date@1']['output'];
+    lastActivityAt: CodecTypes['mongo/date@1']['output'];
+    lastActivitySequence: CodecTypes['mongo/int32@1']['output'];
+    lastReadSequence: CodecTypes['mongo/int32@1']['output'];
+    readonly [RelationKeys]?: never;
+  };
+  export type unbound_ChatMessage = {
+    _id: CodecTypes['mongo/objectId@1']['output'];
+    conversationId: CodecTypes['mongo/objectId@1']['output'];
+    senderId: CodecTypes['mongo/objectId@1']['output'];
+    sequence: CodecTypes['mongo/int32@1']['output'];
+    clientMessageId: CodecTypes['mongo/string@1']['output'];
+    content: CodecTypes['mongo/string@1']['output'];
+    createdAt: CodecTypes['mongo/date@1']['output'];
+    readonly [RelationKeys]?: never;
+  };
 }
 
 export declare const models: {
@@ -232,6 +334,9 @@ export declare const models: {
     PasswordResetToken: Models.unbound_PasswordResetToken;
     AgendaItem: Models.unbound_AgendaItem;
     AgendaParticipation: Models.unbound_AgendaParticipation;
+    ChatConversation: Models.unbound_ChatConversation;
+    ChatMember: Models.unbound_ChatMember;
+    ChatMessage: Models.unbound_ChatMessage;
   };
 };
 
@@ -318,6 +423,140 @@ type ContractBase = Omit<
                     'interested',
                     'updatedAt',
                     'userId',
+                  ];
+                };
+                readonly validationLevel: 'strict';
+                readonly validationAction: 'error';
+              };
+            };
+            readonly chat_conversations: {
+              readonly kind: 'mongo-collection';
+              readonly validator: {
+                readonly kind: 'mongo-validator';
+                readonly jsonSchema: {
+                  readonly bsonType: 'object';
+                  readonly properties: {
+                    readonly _id: { readonly bsonType: 'objectId' };
+                    readonly kind: { readonly bsonType: 'string' };
+                    readonly title: { readonly bsonType: readonly ['null', 'string'] };
+                    readonly directKey: { readonly bsonType: readonly ['null', 'string'] };
+                    readonly createdBy: { readonly bsonType: 'objectId' };
+                    readonly adminUserId: { readonly bsonType: readonly ['null', 'objectId'] };
+                    readonly sequence: { readonly bsonType: 'int' };
+                    readonly lastMessageSequence: { readonly bsonType: 'int' };
+                    readonly lastMessageContent: { readonly bsonType: readonly ['null', 'string'] };
+                    readonly lastMessageSenderId: {
+                      readonly bsonType: readonly ['null', 'objectId'];
+                    };
+                    readonly lastMessageAt: { readonly bsonType: readonly ['null', 'date'] };
+                    readonly createdAt: { readonly bsonType: 'date' };
+                    readonly updatedAt: { readonly bsonType: 'date' };
+                  };
+                  readonly additionalProperties: false;
+                  readonly required: readonly [
+                    '_id',
+                    'createdAt',
+                    'createdBy',
+                    'kind',
+                    'lastMessageSequence',
+                    'sequence',
+                    'updatedAt',
+                  ];
+                };
+                readonly validationLevel: 'strict';
+                readonly validationAction: 'error';
+              };
+            };
+            readonly chat_members: {
+              readonly kind: 'mongo-collection';
+              readonly indexes: readonly [
+                {
+                  readonly kind: 'mongo-index';
+                  readonly keys: readonly [
+                    { readonly field: 'conversationId'; readonly direction: 1 },
+                    { readonly field: 'userId'; readonly direction: 1 },
+                  ];
+                  readonly unique: true;
+                },
+                {
+                  readonly kind: 'mongo-index';
+                  readonly keys: readonly [
+                    { readonly field: 'userId'; readonly direction: 1 },
+                    { readonly field: 'lastActivityAt'; readonly direction: 1 },
+                  ];
+                },
+              ];
+              readonly validator: {
+                readonly kind: 'mongo-validator';
+                readonly jsonSchema: {
+                  readonly bsonType: 'object';
+                  readonly properties: {
+                    readonly _id: { readonly bsonType: 'objectId' };
+                    readonly conversationId: { readonly bsonType: 'objectId' };
+                    readonly userId: { readonly bsonType: 'objectId' };
+                    readonly joinedAt: { readonly bsonType: 'date' };
+                    readonly lastActivityAt: { readonly bsonType: 'date' };
+                    readonly lastActivitySequence: { readonly bsonType: 'int' };
+                    readonly lastReadSequence: { readonly bsonType: 'int' };
+                  };
+                  readonly additionalProperties: false;
+                  readonly required: readonly [
+                    '_id',
+                    'conversationId',
+                    'joinedAt',
+                    'lastActivityAt',
+                    'lastActivitySequence',
+                    'lastReadSequence',
+                    'userId',
+                  ];
+                };
+                readonly validationLevel: 'strict';
+                readonly validationAction: 'error';
+              };
+            };
+            readonly chat_messages: {
+              readonly kind: 'mongo-collection';
+              readonly indexes: readonly [
+                {
+                  readonly kind: 'mongo-index';
+                  readonly keys: readonly [
+                    { readonly field: 'conversationId'; readonly direction: 1 },
+                    { readonly field: 'sequence'; readonly direction: 1 },
+                  ];
+                  readonly unique: true;
+                },
+                {
+                  readonly kind: 'mongo-index';
+                  readonly keys: readonly [
+                    { readonly field: 'conversationId'; readonly direction: 1 },
+                    { readonly field: 'senderId'; readonly direction: 1 },
+                    { readonly field: 'clientMessageId'; readonly direction: 1 },
+                  ];
+                  readonly unique: true;
+                },
+              ];
+              readonly validator: {
+                readonly kind: 'mongo-validator';
+                readonly jsonSchema: {
+                  readonly bsonType: 'object';
+                  readonly properties: {
+                    readonly _id: { readonly bsonType: 'objectId' };
+                    readonly conversationId: { readonly bsonType: 'objectId' };
+                    readonly senderId: { readonly bsonType: 'objectId' };
+                    readonly sequence: { readonly bsonType: 'int' };
+                    readonly clientMessageId: { readonly bsonType: 'string' };
+                    readonly content: { readonly bsonType: 'string' };
+                    readonly createdAt: { readonly bsonType: 'date' };
+                  };
+                  readonly additionalProperties: false;
+                  readonly required: readonly [
+                    '_id',
+                    'clientMessageId',
+                    'content',
+                    'conversationId',
+                    'createdAt',
+                    'senderId',
+                    'sequence',
                   ];
                 };
                 readonly validationLevel: 'strict';
@@ -411,6 +650,10 @@ type ContractBase = Omit<
                   readonly keys: readonly [{ readonly field: 'email'; readonly direction: 1 }];
                   readonly unique: true;
                 },
+                {
+                  readonly kind: 'mongo-index';
+                  readonly keys: readonly [{ readonly field: 'name'; readonly direction: 1 }];
+                },
               ];
               readonly validator: {
                 readonly kind: 'mongo-validator';
@@ -462,6 +705,18 @@ type ContractBase = Omit<
     readonly agenda_participations: {
       readonly namespace: '__unbound__' & NamespaceId;
       readonly model: 'AgendaParticipation';
+    };
+    readonly chat_conversations: {
+      readonly namespace: '__unbound__' & NamespaceId;
+      readonly model: 'ChatConversation';
+    };
+    readonly chat_members: {
+      readonly namespace: '__unbound__' & NamespaceId;
+      readonly model: 'ChatMember';
+    };
+    readonly chat_messages: {
+      readonly namespace: '__unbound__' & NamespaceId;
+      readonly model: 'ChatMessage';
     };
   };
   readonly domain: {
@@ -608,6 +863,132 @@ type ContractBase = Omit<
               };
             };
             readonly storage: { readonly collection: 'agenda_participations' };
+          };
+          readonly ChatConversation: {
+            readonly fields: {
+              readonly _id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/objectId@1' };
+              };
+              readonly kind: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/string@1' };
+              };
+              readonly title: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/string@1' };
+              };
+              readonly directKey: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/string@1' };
+              };
+              readonly createdBy: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/objectId@1' };
+              };
+              readonly adminUserId: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/objectId@1' };
+              };
+              readonly sequence: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/int32@1' };
+              };
+              readonly lastMessageSequence: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/int32@1' };
+              };
+              readonly lastMessageContent: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/string@1' };
+              };
+              readonly lastMessageSenderId: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/objectId@1' };
+              };
+              readonly lastMessageAt: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/date@1' };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/date@1' };
+              };
+              readonly updatedAt: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/date@1' };
+              };
+            };
+            readonly relations: Record<string, never>;
+            readonly storage: { readonly collection: 'chat_conversations' };
+          };
+          readonly ChatMember: {
+            readonly fields: {
+              readonly _id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/objectId@1' };
+              };
+              readonly conversationId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/objectId@1' };
+              };
+              readonly userId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/objectId@1' };
+              };
+              readonly joinedAt: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/date@1' };
+              };
+              readonly lastActivityAt: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/date@1' };
+              };
+              readonly lastActivitySequence: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/int32@1' };
+              };
+              readonly lastReadSequence: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/int32@1' };
+              };
+            };
+            readonly relations: Record<string, never>;
+            readonly storage: { readonly collection: 'chat_members' };
+          };
+          readonly ChatMessage: {
+            readonly fields: {
+              readonly _id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/objectId@1' };
+              };
+              readonly conversationId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/objectId@1' };
+              };
+              readonly senderId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/objectId@1' };
+              };
+              readonly sequence: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/int32@1' };
+              };
+              readonly clientMessageId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/string@1' };
+              };
+              readonly content: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/string@1' };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/date@1' };
+              };
+            };
+            readonly relations: Record<string, never>;
+            readonly storage: { readonly collection: 'chat_messages' };
           };
           readonly PasswordResetToken: {
             readonly fields: {

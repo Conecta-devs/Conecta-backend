@@ -1,0 +1,805 @@
+[
+  {
+    "id": "collection.agenda_items.create",
+    "label": "Create collection agenda_items",
+    "operationClass": "additive",
+    "precheck": [
+      {
+        "description": "collection agenda_items does not exist",
+        "source": {
+          "kind": "listCollections"
+        },
+        "filter": {
+          "kind": "field",
+          "field": "name",
+          "op": "$eq",
+          "value": "agenda_items"
+        },
+        "expect": "notExists"
+      }
+    ],
+    "execute": [
+      {
+        "description": "create collection agenda_items",
+        "command": {
+          "kind": "createCollection",
+          "collection": "agenda_items",
+          "validator": {
+            "$jsonSchema": {
+              "additionalProperties": false,
+              "bsonType": "object",
+              "properties": {
+                "_id": {
+                  "bsonType": "objectId"
+                },
+                "cancelledAt": {
+                  "bsonType": [
+                    "null",
+                    "date"
+                  ]
+                },
+                "createdAt": {
+                  "bsonType": "date"
+                },
+                "description": {
+                  "bsonType": "string"
+                },
+                "endsAt": {
+                  "bsonType": "date"
+                },
+                "format": {
+                  "bsonType": "string"
+                },
+                "kind": {
+                  "bsonType": "string"
+                },
+                "location": {
+                  "bsonType": [
+                    "null",
+                    "string"
+                  ]
+                },
+                "meetingUrl": {
+                  "bsonType": [
+                    "null",
+                    "string"
+                  ]
+                },
+                "organizerId": {
+                  "bsonType": "objectId"
+                },
+                "startsAt": {
+                  "bsonType": "date"
+                },
+                "title": {
+                  "bsonType": "string"
+                },
+                "updatedAt": {
+                  "bsonType": "date"
+                }
+              },
+              "required": [
+                "_id",
+                "createdAt",
+                "description",
+                "endsAt",
+                "format",
+                "kind",
+                "organizerId",
+                "startsAt",
+                "title",
+                "updatedAt"
+              ]
+            }
+          },
+          "validationLevel": "strict",
+          "validationAction": "error"
+        }
+      }
+    ],
+    "postcheck": []
+  },
+  {
+    "id": "collection.agenda_participations.create",
+    "label": "Create collection agenda_participations",
+    "operationClass": "additive",
+    "precheck": [
+      {
+        "description": "collection agenda_participations does not exist",
+        "source": {
+          "kind": "listCollections"
+        },
+        "filter": {
+          "kind": "field",
+          "field": "name",
+          "op": "$eq",
+          "value": "agenda_participations"
+        },
+        "expect": "notExists"
+      }
+    ],
+    "execute": [
+      {
+        "description": "create collection agenda_participations",
+        "command": {
+          "kind": "createCollection",
+          "collection": "agenda_participations",
+          "validator": {
+            "$jsonSchema": {
+              "additionalProperties": false,
+              "bsonType": "object",
+              "properties": {
+                "_id": {
+                  "bsonType": "objectId"
+                },
+                "agendaItemId": {
+                  "bsonType": "objectId"
+                },
+                "confirmed": {
+                  "bsonType": "bool"
+                },
+                "createdAt": {
+                  "bsonType": "date"
+                },
+                "interested": {
+                  "bsonType": "bool"
+                },
+                "updatedAt": {
+                  "bsonType": "date"
+                },
+                "userId": {
+                  "bsonType": "objectId"
+                }
+              },
+              "required": [
+                "_id",
+                "agendaItemId",
+                "confirmed",
+                "createdAt",
+                "interested",
+                "updatedAt",
+                "userId"
+              ]
+            }
+          },
+          "validationLevel": "strict",
+          "validationAction": "error"
+        }
+      }
+    ],
+    "postcheck": []
+  },
+  {
+    "id": "collection.password_reset_tokens.create",
+    "label": "Create collection password_reset_tokens",
+    "operationClass": "additive",
+    "precheck": [
+      {
+        "description": "collection password_reset_tokens does not exist",
+        "source": {
+          "kind": "listCollections"
+        },
+        "filter": {
+          "kind": "field",
+          "field": "name",
+          "op": "$eq",
+          "value": "password_reset_tokens"
+        },
+        "expect": "notExists"
+      }
+    ],
+    "execute": [
+      {
+        "description": "create collection password_reset_tokens",
+        "command": {
+          "kind": "createCollection",
+          "collection": "password_reset_tokens",
+          "validator": {
+            "$jsonSchema": {
+              "additionalProperties": false,
+              "bsonType": "object",
+              "properties": {
+                "_id": {
+                  "bsonType": "objectId"
+                },
+                "consumedAt": {
+                  "bsonType": [
+                    "null",
+                    "date"
+                  ]
+                },
+                "expiresAt": {
+                  "bsonType": "date"
+                },
+                "tokenHash": {
+                  "bsonType": "string"
+                },
+                "userId": {
+                  "bsonType": "objectId"
+                }
+              },
+              "required": [
+                "_id",
+                "expiresAt",
+                "tokenHash",
+                "userId"
+              ]
+            }
+          },
+          "validationLevel": "strict",
+          "validationAction": "error"
+        }
+      }
+    ],
+    "postcheck": []
+  },
+  {
+    "id": "collection.posts.create",
+    "label": "Create collection posts",
+    "operationClass": "additive",
+    "precheck": [
+      {
+        "description": "collection posts does not exist",
+        "source": {
+          "kind": "listCollections"
+        },
+        "filter": {
+          "kind": "field",
+          "field": "name",
+          "op": "$eq",
+          "value": "posts"
+        },
+        "expect": "notExists"
+      }
+    ],
+    "execute": [
+      {
+        "description": "create collection posts",
+        "command": {
+          "kind": "createCollection",
+          "collection": "posts",
+          "validator": {
+            "$jsonSchema": {
+              "additionalProperties": false,
+              "bsonType": "object",
+              "properties": {
+                "_id": {
+                  "bsonType": "objectId"
+                },
+                "authorId": {
+                  "bsonType": "objectId"
+                },
+                "content": {
+                  "bsonType": [
+                    "null",
+                    "string"
+                  ]
+                },
+                "title": {
+                  "bsonType": "string"
+                }
+              },
+              "required": [
+                "_id",
+                "authorId",
+                "title"
+              ]
+            }
+          },
+          "validationLevel": "strict",
+          "validationAction": "error"
+        }
+      }
+    ],
+    "postcheck": []
+  },
+  {
+    "id": "collection.sessions.create",
+    "label": "Create collection sessions",
+    "operationClass": "additive",
+    "precheck": [
+      {
+        "description": "collection sessions does not exist",
+        "source": {
+          "kind": "listCollections"
+        },
+        "filter": {
+          "kind": "field",
+          "field": "name",
+          "op": "$eq",
+          "value": "sessions"
+        },
+        "expect": "notExists"
+      }
+    ],
+    "execute": [
+      {
+        "description": "create collection sessions",
+        "command": {
+          "kind": "createCollection",
+          "collection": "sessions",
+          "validator": {
+            "$jsonSchema": {
+              "additionalProperties": false,
+              "bsonType": "object",
+              "properties": {
+                "_id": {
+                  "bsonType": "objectId"
+                },
+                "authVersion": {
+                  "bsonType": [
+                    "null",
+                    "int"
+                  ]
+                },
+                "expiresAt": {
+                  "bsonType": "date"
+                },
+                "revokedAt": {
+                  "bsonType": [
+                    "null",
+                    "date"
+                  ]
+                },
+                "tokenHash": {
+                  "bsonType": "string"
+                },
+                "userId": {
+                  "bsonType": "objectId"
+                }
+              },
+              "required": [
+                "_id",
+                "expiresAt",
+                "tokenHash",
+                "userId"
+              ]
+            }
+          },
+          "validationLevel": "strict",
+          "validationAction": "error"
+        }
+      }
+    ],
+    "postcheck": []
+  },
+  {
+    "id": "collection.users.create",
+    "label": "Create collection users",
+    "operationClass": "additive",
+    "precheck": [
+      {
+        "description": "collection users does not exist",
+        "source": {
+          "kind": "listCollections"
+        },
+        "filter": {
+          "kind": "field",
+          "field": "name",
+          "op": "$eq",
+          "value": "users"
+        },
+        "expect": "notExists"
+      }
+    ],
+    "execute": [
+      {
+        "description": "create collection users",
+        "command": {
+          "kind": "createCollection",
+          "collection": "users",
+          "validator": {
+            "$jsonSchema": {
+              "additionalProperties": false,
+              "bsonType": "object",
+              "properties": {
+                "_id": {
+                  "bsonType": "objectId"
+                },
+                "authVersion": {
+                  "bsonType": [
+                    "null",
+                    "int"
+                  ]
+                },
+                "bio": {
+                  "bsonType": [
+                    "null",
+                    "string"
+                  ]
+                },
+                "email": {
+                  "bsonType": "string"
+                },
+                "gen": {
+                  "bsonType": [
+                    "null",
+                    "string"
+                  ]
+                },
+                "image": {
+                  "bsonType": [
+                    "null",
+                    "string"
+                  ]
+                },
+                "name": {
+                  "bsonType": "string"
+                },
+                "passwordHash": {
+                  "bsonType": "string"
+                },
+                "permissao": {
+                  "bsonType": [
+                    "null",
+                    "string"
+                  ]
+                }
+              },
+              "required": [
+                "_id",
+                "email",
+                "name",
+                "passwordHash"
+              ]
+            }
+          },
+          "validationLevel": "strict",
+          "validationAction": "error"
+        }
+      }
+    ],
+    "postcheck": []
+  },
+  {
+    "id": "index.agenda_participations.create(agendaItemId:1,userId:1)",
+    "label": "Create index on agenda_participations (agendaItemId:1, userId:1)",
+    "operationClass": "additive",
+    "precheck": [
+      {
+        "description": "index does not already exist on agenda_participations",
+        "source": {
+          "kind": "listIndexes",
+          "collection": "agenda_participations"
+        },
+        "filter": {
+          "kind": "field",
+          "field": "key",
+          "op": "$eq",
+          "value": {
+            "agendaItemId": 1,
+            "userId": 1
+          }
+        },
+        "expect": "notExists"
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index on agenda_participations",
+        "command": {
+          "kind": "createIndex",
+          "collection": "agenda_participations",
+          "keys": [
+            {
+              "direction": 1,
+              "field": "agendaItemId"
+            },
+            {
+              "direction": 1,
+              "field": "userId"
+            }
+          ],
+          "unique": true,
+          "name": "agendaItemId_1_userId_1"
+        }
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "index exists on agenda_participations",
+        "source": {
+          "kind": "listIndexes",
+          "collection": "agenda_participations"
+        },
+        "filter": {
+          "kind": "and",
+          "exprs": [
+            {
+              "kind": "field",
+              "field": "key",
+              "op": "$eq",
+              "value": {
+                "agendaItemId": 1,
+                "userId": 1
+              }
+            },
+            {
+              "kind": "field",
+              "field": "unique",
+              "op": "$eq",
+              "value": true
+            }
+          ]
+        },
+        "expect": "exists"
+      }
+    ]
+  },
+  {
+    "id": "index.password_reset_tokens.create(userId:1)",
+    "label": "Create index on password_reset_tokens (userId:1)",
+    "operationClass": "additive",
+    "precheck": [
+      {
+        "description": "index does not already exist on password_reset_tokens",
+        "source": {
+          "kind": "listIndexes",
+          "collection": "password_reset_tokens"
+        },
+        "filter": {
+          "kind": "field",
+          "field": "key",
+          "op": "$eq",
+          "value": {
+            "userId": 1
+          }
+        },
+        "expect": "notExists"
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index on password_reset_tokens",
+        "command": {
+          "kind": "createIndex",
+          "collection": "password_reset_tokens",
+          "keys": [
+            {
+              "direction": 1,
+              "field": "userId"
+            }
+          ],
+          "unique": true,
+          "name": "userId_1"
+        }
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "index exists on password_reset_tokens",
+        "source": {
+          "kind": "listIndexes",
+          "collection": "password_reset_tokens"
+        },
+        "filter": {
+          "kind": "and",
+          "exprs": [
+            {
+              "kind": "field",
+              "field": "key",
+              "op": "$eq",
+              "value": {
+                "userId": 1
+              }
+            },
+            {
+              "kind": "field",
+              "field": "unique",
+              "op": "$eq",
+              "value": true
+            }
+          ]
+        },
+        "expect": "exists"
+      }
+    ]
+  },
+  {
+    "id": "index.password_reset_tokens.create(tokenHash:1)",
+    "label": "Create index on password_reset_tokens (tokenHash:1)",
+    "operationClass": "additive",
+    "precheck": [
+      {
+        "description": "index does not already exist on password_reset_tokens",
+        "source": {
+          "kind": "listIndexes",
+          "collection": "password_reset_tokens"
+        },
+        "filter": {
+          "kind": "field",
+          "field": "key",
+          "op": "$eq",
+          "value": {
+            "tokenHash": 1
+          }
+        },
+        "expect": "notExists"
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index on password_reset_tokens",
+        "command": {
+          "kind": "createIndex",
+          "collection": "password_reset_tokens",
+          "keys": [
+            {
+              "direction": 1,
+              "field": "tokenHash"
+            }
+          ],
+          "unique": true,
+          "name": "tokenHash_1"
+        }
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "index exists on password_reset_tokens",
+        "source": {
+          "kind": "listIndexes",
+          "collection": "password_reset_tokens"
+        },
+        "filter": {
+          "kind": "and",
+          "exprs": [
+            {
+              "kind": "field",
+              "field": "key",
+              "op": "$eq",
+              "value": {
+                "tokenHash": 1
+              }
+            },
+            {
+              "kind": "field",
+              "field": "unique",
+              "op": "$eq",
+              "value": true
+            }
+          ]
+        },
+        "expect": "exists"
+      }
+    ]
+  },
+  {
+    "id": "index.sessions.create(tokenHash:1)",
+    "label": "Create index on sessions (tokenHash:1)",
+    "operationClass": "additive",
+    "precheck": [
+      {
+        "description": "index does not already exist on sessions",
+        "source": {
+          "kind": "listIndexes",
+          "collection": "sessions"
+        },
+        "filter": {
+          "kind": "field",
+          "field": "key",
+          "op": "$eq",
+          "value": {
+            "tokenHash": 1
+          }
+        },
+        "expect": "notExists"
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index on sessions",
+        "command": {
+          "kind": "createIndex",
+          "collection": "sessions",
+          "keys": [
+            {
+              "direction": 1,
+              "field": "tokenHash"
+            }
+          ],
+          "unique": true,
+          "name": "tokenHash_1"
+        }
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "index exists on sessions",
+        "source": {
+          "kind": "listIndexes",
+          "collection": "sessions"
+        },
+        "filter": {
+          "kind": "and",
+          "exprs": [
+            {
+              "kind": "field",
+              "field": "key",
+              "op": "$eq",
+              "value": {
+                "tokenHash": 1
+              }
+            },
+            {
+              "kind": "field",
+              "field": "unique",
+              "op": "$eq",
+              "value": true
+            }
+          ]
+        },
+        "expect": "exists"
+      }
+    ]
+  },
+  {
+    "id": "index.users.create(email:1)",
+    "label": "Create index on users (email:1)",
+    "operationClass": "additive",
+    "precheck": [
+      {
+        "description": "index does not already exist on users",
+        "source": {
+          "kind": "listIndexes",
+          "collection": "users"
+        },
+        "filter": {
+          "kind": "field",
+          "field": "key",
+          "op": "$eq",
+          "value": {
+            "email": 1
+          }
+        },
+        "expect": "notExists"
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index on users",
+        "command": {
+          "kind": "createIndex",
+          "collection": "users",
+          "keys": [
+            {
+              "direction": 1,
+              "field": "email"
+            }
+          ],
+          "unique": true,
+          "name": "email_1"
+        }
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "index exists on users",
+        "source": {
+          "kind": "listIndexes",
+          "collection": "users"
+        },
+        "filter": {
+          "kind": "and",
+          "exprs": [
+            {
+              "kind": "field",
+              "field": "key",
+              "op": "$eq",
+              "value": {
+                "email": 1
+              }
+            },
+            {
+              "kind": "field",
+              "field": "unique",
+              "op": "$eq",
+              "value": true
+            }
+          ]
+        },
+        "expect": "exists"
+      }
+    ]
+  }
+]

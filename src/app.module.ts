@@ -5,6 +5,8 @@ import { AppService } from './app.service.js';
 import { AuthModule } from './auth/auth.module.js';
 import { PostsModule } from './posts/posts.module.js';
 import { AgendaModule } from './agenda/agenda.module.js';
+import { ChatModule } from './chat/chat.module.js';
+import { PrismaLifecycle } from './prisma/prisma-lifecycle.js';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -20,8 +22,9 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
     AuthModule,
     PostsModule,
     AgendaModule,
+    ChatModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, PrismaLifecycle],
 })
 export class AppModule {}
