@@ -23,5 +23,6 @@ import { ResendEmailService } from './resend-email.service.js';
   ],
   providers: [AuthService, JwtStrategy, ResendEmailService],
   controllers: [AuthController],
+  exports: [JwtModule, JwtStrategy],
 })
 export class AuthModule {}

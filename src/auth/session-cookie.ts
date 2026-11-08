@@ -1,3 +1,4 @@
+
 import { ForbiddenException } from '@nestjs/common';
 import type { CookieOptions, Request, Response } from 'express';
 
@@ -10,7 +11,14 @@ export const CSRF_HEADER_VALUE = '1';
 const REFRESH_TOKEN_PATTERN =
   /^[a-f0-9]{24}\.[A-Za-z0-9_-]{64}\.[A-Za-z0-9_-]{64}$/;
 
-export function getConfiguredAuthOrigins() {
+function isLocalDevelopmentOrigin(url: URL) {
+  return (
+    (url.hostname === 'localhost' || url.hostname === '127.0.0.1') &&
+    url.protocol === 'http:'
+  );
+}
+
+export function getConfiguredAuthOrigins(): string[] {
   const configured = process.env.AUTH_ALLOWED_ORIGINS;
 
   if (!configured?.trim()) {
@@ -22,9 +30,13 @@ export function getConfiguredAuthOrigins() {
 
     try {
       const url = new URL(value);
+      const isLocalhost = isLocalDevelopmentOrigin(url);
+
       if (
         !['http:', 'https:'].includes(url.protocol) ||
-        (process.env.NODE_ENV === 'production' && url.protocol !== 'https:') ||
+        (process.env.NODE_ENV === 'production' &&
+          url.protocol !== 'https:' &&
+          !isLocalhost) ||
         url.username ||
         url.password ||
         url.pathname !== '/' ||
@@ -36,18 +48,22 @@ export function getConfiguredAuthOrigins() {
 
       return url.origin;
     } catch {
-      throw new Error('AUTH_ALLOWED_ORIGINS must contain valid origin URLs');
+      throw new Error(
+        'AUTH_ALLOWED_ORIGINS must contain valid origin URLs',
+      );
     }
   });
 }
 
 export function assertAuthRequestAllowed(request: Request) {
   const origin = request.get('origin');
+
   if (!origin || request.get(CSRF_HEADER_NAME) !== CSRF_HEADER_VALUE) {
     throw new ForbiddenException('Origem ou proteção CSRF inválida');
   }
 
   let parsedOrigin: URL;
+
   try {
     parsedOrigin = new URL(origin);
   } catch {
@@ -62,6 +78,7 @@ export function assertAuthRequestAllowed(request: Request) {
   }
 
   const allowedOrigins = getConfiguredAuthOrigins();
+
   const isAllowed = allowedOrigins.length
     ? allowedOrigins.includes(parsedOrigin.origin)
     : parsedOrigin.host.toLowerCase() ===
@@ -76,14 +93,20 @@ export function assertAuthRequestAllowed(request: Request) {
 
 export function readRefreshToken(request: Request) {
   const cookieHeader = request.headers.cookie;
+
   if (!cookieHeader) {
     return undefined;
   }
 
   let token: string | undefined;
+
   for (const cookie of cookieHeader.split(';')) {
     const separator = cookie.indexOf('=');
-    if (separator < 0 || cookie.slice(0, separator).trim() !== REFRESH_COOKIE_NAME) {
+
+    if (
+      separator < 0 ||
+      cookie.slice(0, separator).trim() !== REFRESH_COOKIE_NAME
+    ) {
       continue;
     }
 
@@ -94,16 +117,20 @@ export function readRefreshToken(request: Request) {
     token = cookie.slice(separator + 1).trim();
   }
 
-  return token && REFRESH_TOKEN_PATTERN.test(token) ? token : undefined;
+  return token && REFRESH_TOKEN_PATTERN.test(token)
+    ? token
+    : undefined;
 }
 
 function refreshCookieOptions(): CookieOptions {
   const secure = process.env.NODE_ENV === 'production';
-  const sameSite = process.env.AUTH_COOKIE_SAME_SITE?.toLowerCase() ?? 'lax';
+  const sameSite =
+    process.env.AUTH_COOKIE_SAME_SITE?.toLowerCase() ?? 'lax';
 
   if (sameSite !== 'lax' && sameSite !== 'none') {
     throw new Error('AUTH_COOKIE_SAME_SITE must be either lax or none');
   }
+
   if (sameSite === 'none' && !secure) {
     throw new Error('AUTH_COOKIE_SAME_SITE=none requires production HTTPS');
   }

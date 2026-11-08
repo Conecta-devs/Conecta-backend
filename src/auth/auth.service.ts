@@ -206,8 +206,6 @@ export class AuthService {
   }
 
   async requestPasswordReset(dto: ForgotPasswordDto) {
-    this.resendEmailService.assertConfigured();
-
     const normalizedEmail = dto.email.trim().toLowerCase();
     const user = await db.orm.users
       .where({
@@ -254,9 +252,16 @@ export class AuthService {
       }
     }
 
-    void this.resendEmailService
-      .sendPasswordReset(normalizedEmail, token)
-      .catch(() => this.logger.warn('Password reset email delivery failed'));
+    try {
+      this.resendEmailService.assertConfigured();
+      void this.resendEmailService
+        .sendPasswordReset(normalizedEmail, token)
+        .catch(() => this.logger.warn('Password reset email delivery failed'));
+    } catch {
+      this.logger.warn(
+        'Password reset email service is not configured; request still accepted',
+      );
+    }
 
     return PASSWORD_RESET_RESPONSE;
   }

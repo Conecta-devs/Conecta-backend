@@ -16,6 +16,7 @@ model User {
   organizedAgendaItems AgendaItem[]
   agendaParticipations AgendaParticipation[]
 
+  @@index([name])
   @@map("users")
 }
 
@@ -85,4 +86,50 @@ model AgendaParticipation {
 
   @@unique([agendaItemId, userId])
   @@map("agenda_participations")
+}
+
+model ChatConversation {
+  id                   ObjectId @id @map("_id")
+  kind                 String
+  title                String?
+  directKey            String?
+  createdBy            ObjectId
+  adminUserId          ObjectId?
+  sequence             Int
+  lastMessageSequence  Int
+  lastMessageContent   String?
+  lastMessageSenderId  ObjectId?
+  lastMessageAt        DateTime?
+  createdAt            DateTime
+  updatedAt            DateTime
+
+  @@map("chat_conversations")
+}
+
+model ChatMember {
+  id                ObjectId @id @map("_id")
+  conversationId    ObjectId
+  userId            ObjectId
+  joinedAt          DateTime
+  lastActivityAt    DateTime
+  lastActivitySequence Int
+  lastReadSequence  Int
+
+  @@unique([conversationId, userId])
+  @@index([userId, lastActivityAt])
+  @@map("chat_members")
+}
+
+model ChatMessage {
+  id               ObjectId @id @map("_id")
+  conversationId   ObjectId
+  senderId         ObjectId
+  sequence         Int
+  clientMessageId String
+  content          String
+  createdAt        DateTime
+
+  @@unique([conversationId, sequence])
+  @@unique([conversationId, senderId, clientMessageId])
+  @@map("chat_messages")
 }

@@ -8,6 +8,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     instrument: ObserveInstrument,
   });
+  app.enableShutdownHooks();
 
   const authOrigins = getConfiguredAuthOrigins();
   if (authOrigins.length > 0) {
