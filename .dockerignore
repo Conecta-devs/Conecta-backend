@@ -1,0 +1,26 @@
+# Instalações locais (binários do Windows quebrariam a imagem Linux —
+# o npm ci dentro do container já instala as versões corretas)
+node_modules
+
+# Build local desatualizado (a imagem compila do zero)
+dist
+
+# Segredos — nunca entram na imagem; no Vercel as variáveis vêm das
+# configurações do projeto, injetadas em tempo de execução
+.env
+.env.*
+
+# Controle de versão e diretórios de agentes/ferramentas
+.git
+.gitattributes
+.vscode
+.claude
+.cursor
+.agents
+.devin
+
+# Testes e artefatos de build
+test
+coverage
+*.tsbuildinfo
+npm-debug.log*
