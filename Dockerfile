@@ -1,11 +1,9 @@
 # syntax=docker/dockerfile:1
 #
 # Imagem de container para o Vercel (Container Runtime).
-# O nome "Dockerfile.vercel" é proposital: ele faz o preset "Container"
-# vencer sobre a detecção automática de NestJS do Vercel, que hoje usa
-# um builder que não suporta require() de ESM (bug do @nestjs/throttler
-# CJS exigindo @nestjs/common ESM). O Render ignora este arquivo porque
-# só procura por "Dockerfile", então o deploy atual lá não muda nada.
+# Requer o Framework Preset do projeto no Vercel definido como
+# "Container"/"Docker" (a detecção automática de NestJS não é sobrepujada
+# só pela presença deste arquivo — mudar o preset nas configurações).
 
 # --- Estágio 1: instalar dependências e compilar -------------------------
 FROM node:24-slim AS build

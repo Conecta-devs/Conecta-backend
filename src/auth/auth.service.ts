@@ -253,15 +253,23 @@ export class AuthService {
     }
 
     try {
-      this.resendEmailService.assertConfigured();
-      void this.resendEmailService
-        .sendPasswordReset(normalizedEmail, token)
-        .catch(() => this.logger.warn('Password reset email delivery failed'));
-    } catch {
-      this.logger.warn(
-        'Password reset email service is not configured; request still accepted',
+  this.resendEmailService.assertConfigured();
+  void this.resendEmailService
+    .sendPasswordReset(normalizedEmail, token)
+    .catch((error: unknown) => {
+      const err = error instanceof Error ? error : new Error(String(error));
+      this.logger.error(
+        `Password reset email delivery failed (userId=${user._id}): ${err.message}`,
+        err.stack,
       );
-    }
+    });
+} catch (error) {
+  this.logger.warn(
+    `Password reset email service is not configured; request still accepted: ${
+      error instanceof Error ? error.message : String(error)
+    }`,
+  );
+}
 
     return PASSWORD_RESET_RESPONSE;
   }
