@@ -6,7 +6,7 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt-strategy/jwt-strategy.js';
 import { getJwtSecret } from './jwt-secret.js';
 import { ThrottlerModule } from '@nestjs/throttler';
-import { ResendEmailService } from './resend-email.service.js';
+import { BrevoEmailService } from './brevo-email.service.js';
 
 @Module({
   imports: [
@@ -21,7 +21,7 @@ import { ResendEmailService } from './resend-email.service.js';
       },
     }),
   ],
-  providers: [AuthService, JwtStrategy, ResendEmailService],
+  providers: [AuthService, JwtStrategy, BrevoEmailService],
   controllers: [AuthController],
   exports: [JwtModule, JwtStrategy],
 })

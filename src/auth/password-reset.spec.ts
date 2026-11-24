@@ -3,7 +3,7 @@ import { Logger, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { vi } from 'vitest';
 import { AuthService } from './auth.service.js';
-import { ResendEmailService } from './resend-email.service.js';
+import { BrevoEmailService } from './brevo-email.service.js';
 
 const state = vi.hoisted(() => {
   const user: Record<string, unknown> = {
@@ -202,7 +202,7 @@ describe('AuthService password recovery', () => {
     vi.spyOn(Logger.prototype, 'warn').mockImplementation(() => undefined);
     service = new AuthService(
       { sign: state.jwtSign } as unknown as JwtService,
-      mailer as unknown as ResendEmailService,
+      mailer as unknown as BrevoEmailService,
     );
   });
 
@@ -244,7 +244,7 @@ describe('AuthService password recovery', () => {
     expect(state.resetTokens).toHaveLength(0);
   });
 
-  it('returns the generic response when Resend delivery fails', async () => {
+  it('returns the generic response when Brevo delivery fails', async () => {
     mailer.sendPasswordReset.mockRejectedValue(new Error('provider error'));
 
     await expect(

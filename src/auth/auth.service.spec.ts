@@ -4,7 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { vi } from 'vitest';
 import { AuthService } from './auth.service.js';
-import { ResendEmailService } from './resend-email.service.js';
+import { BrevoEmailService } from './brevo-email.service.js';
 
 const state = vi.hoisted(() => {
   const store: {
@@ -184,7 +184,7 @@ describe('AuthService refresh token lifecycle', () => {
     } as unknown as JwtService, {
       assertConfigured: vi.fn(),
       sendPasswordReset: vi.fn(),
-    } as unknown as ResendEmailService);
+    } as unknown as BrevoEmailService);
   });
 
   it('creates a session with only the SHA-256 hash at login', async () => {

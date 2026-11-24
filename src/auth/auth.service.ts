@@ -16,7 +16,7 @@ import { ResetPasswordDto } from './dto/reset-password.dto.js';
 import { EditarDto } from './dto/editar.dto.js';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { ResendEmailService } from './resend-email.service.js';
+import { BrevoEmailService } from './brevo-email.service.js';
 
 const REFRESH_TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 const REFRESH_TOKEN_PATTERN =
@@ -34,7 +34,7 @@ export class AuthService {
 
   constructor(
     private readonly jwtService: JwtService,
-    private readonly resendEmailService: ResendEmailService,
+    private readonly brevoEmailService: BrevoEmailService,
   ) {}
 
   async register(dto: RegisterDto) {
@@ -253,8 +253,8 @@ export class AuthService {
     }
 
     try {
-      this.resendEmailService.assertConfigured();
-      void this.resendEmailService
+      this.brevoEmailService.assertConfigured();
+      void this.brevoEmailService
         .sendPasswordReset(normalizedEmail, token)
         .catch(() => this.logger.warn('Password reset email delivery failed'));
     } catch {
