@@ -24,7 +24,7 @@ export class AgendaService {
       .orderBy({ startsAt: 1 })
       .all();
 
-    return items.map((item) => this.toResponse(item));
+    return Promise.all(items.map((item) => this.toResponse(item)));
   }
 
   async findOne(id: string) {
@@ -39,7 +39,7 @@ export class AgendaService {
       throw new NotFoundException('Encontro não encontrado.');
     }
 
-    return this.toResponse(item);
+    return await this.toResponse(item);
   }
 
   async create(organizerId: string, dto: CreateAgendaItemDto) {
@@ -74,7 +74,7 @@ export class AgendaService {
       updatedAt: now,
     });
 
-    return this.toResponse(item);
+    return await this.toResponse(item);
   }
 
   async update(id: string, organizerId: string, dto: UpdateAgendaItemDto) {
@@ -136,7 +136,7 @@ export class AgendaService {
       throw new ConflictException('O encontro foi alterado ou cancelado simultaneamente.');
     }
 
-    return this.toResponse(updated);
+    return await this.toResponse(updated);
   }
 
   async cancel(id: string, organizerId: string) {
@@ -166,7 +166,7 @@ export class AgendaService {
       throw new ConflictException('O encontro foi alterado ou cancelado simultaneamente.');
     }
 
-    return this.toResponse(cancelled);
+    return await this.toResponse(cancelled);
   }
 
   async getMyParticipation(agendaItemId: string, userId: string) {
@@ -306,7 +306,7 @@ export class AgendaService {
     };
   }
 
-  private toResponse(item: {
+  private async toResponse(item: {
     _id: string;
     title: string;
     description: string;
@@ -321,6 +321,10 @@ export class AgendaService {
     createdAt: Date;
     updatedAt: Date;
   }) {
+    const organizer = await db.orm.users
+      .where({ _id: item.organizerId })
+      .first();
+
     return {
       id: item._id,
       title: item.title,
@@ -332,6 +336,11 @@ export class AgendaService {
       meetingUrl: item.meetingUrl,
       location: item.location,
       organizerId: item.organizerId,
+      organizer: {
+        id: organizer?._id ?? null,
+        name: organizer?.name ?? null,
+        image: organizer?.image ?? null,
+      },
       cancelledAt: item.cancelledAt,
       createdAt: item.createdAt,
       updatedAt: item.updatedAt,

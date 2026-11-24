@@ -22,10 +22,15 @@ const mocks = vi.hoisted(() => {
     first: vi.fn(),
     upsert: vi.fn(),
   };
+  const usersQuery = {
+    where: vi.fn(),
+    first: vi.fn(),
+  };
   query.where.mockReturnValue(query);
   query.orderBy.mockReturnValue(query);
   participationQuery.where.mockReturnValue(participationQuery);
-  return { query, participationQuery };
+  usersQuery.where.mockReturnValue(usersQuery);
+  return { query, participationQuery, usersQuery };
 });
 
 vi.mock('../prisma/db.js', () => ({
@@ -33,6 +38,7 @@ vi.mock('../prisma/db.js', () => ({
     orm: {
       agenda_items: mocks.query,
       agenda_participations: mocks.participationQuery,
+      users: mocks.usersQuery,
     },
   },
 }));
@@ -83,6 +89,8 @@ describe('AgendaService', () => {
     mocks.query.where.mockReturnValue(mocks.query);
     mocks.query.orderBy.mockReturnValue(mocks.query);
     mocks.participationQuery.where.mockReturnValue(mocks.participationQuery);
+    mocks.usersQuery.where.mockReturnValue(mocks.usersQuery);
+    mocks.usersQuery.first.mockResolvedValue(undefined);
   });
 
   it('lists active items ordered by start time', async () => {
@@ -93,6 +101,37 @@ describe('AgendaService', () => {
     ]);
     expect(mocks.query.orderBy).toHaveBeenCalledWith({ startsAt: 1 });
     expect(mocks.query.all).toHaveBeenCalledOnce();
+  });
+
+  it('includes the organizer identity in listed items', async () => {
+    mocks.query.all.mockResolvedValue([item]);
+    mocks.usersQuery.first.mockResolvedValue({
+      _id: item.organizerId,
+      name: 'Marina Costa',
+      image: 'https://example.com/marina.png',
+    });
+
+    await expect(service.findAll()).resolves.toEqual([
+      expect.objectContaining({
+        id: item._id,
+        organizer: {
+          id: item.organizerId,
+          name: 'Marina Costa',
+          image: 'https://example.com/marina.png',
+        },
+      }),
+    ]);
+  });
+
+  it('returns null organizer fields when the user is missing', async () => {
+    mocks.query.all.mockResolvedValue([item]);
+    mocks.usersQuery.first.mockResolvedValue(undefined);
+
+    await expect(service.findAll()).resolves.toEqual([
+      expect.objectContaining({
+        organizer: { id: null, name: null, image: null },
+      }),
+    ]);
   });
 
   it('creates an item with the authenticated organizer and explicit timestamps', async () => {
