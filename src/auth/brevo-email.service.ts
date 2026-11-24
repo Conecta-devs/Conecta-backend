@@ -1,35 +1,37 @@
 import { Injectable, ServiceUnavailableException } from '@nestjs/common';
 
-type ResendConfiguration = {
+type BrevoConfiguration = {
   apiKey: string;
-  from: string;
+  senderName: string;
+  senderEmail: string;
   frontendUrl: URL;
 };
 
 @Injectable()
-export class ResendEmailService {
-  assertConfigured() {
+export class BrevoEmailService {
+  assertConfigured(): void {
     this.getConfiguration();
   }
 
-  async sendPasswordReset(email: string, token: string) {
-    const { apiKey, from, frontendUrl } = this.getConfiguration();
+  async sendPasswordReset(email: string, token: string): Promise<void> {
+    const { apiKey, senderName, senderEmail, frontendUrl } =
+      this.getConfiguration();
     const resetUrl = new URL('/reset-password', frontendUrl);
     resetUrl.searchParams.set('token', token);
     const link = resetUrl.toString();
 
-    const response = await fetch('https://api.resend.com/emails', {
+    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${apiKey}`,
+        'api-key': apiKey,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from,
-        to: [email],
+        sender: { name: senderName, email: senderEmail },
+        to: [{ email }],
         subject: 'Redefinição de senha do Conecta',
-        text: `Para redefinir sua senha, acesse: ${link}`,
-        html: `<p>Para redefinir sua senha, acesse o link abaixo:</p><p><a href="${link}">Redefinir senha</a></p><p>O link expira em 30 minutos. Se você não solicitou a redefinição, ignore este e-mail.</p>`,
+        textContent: `Para redefinir sua senha, acesse: ${link}`,
+        htmlContent: `<p>Para redefinir sua senha, acesse o link abaixo:</p><p><a href="${link}">Redefinir senha</a></p><p>O link expira em 30 minutos. Se você não solicitou a redefinição, ignore este e-mail.</p>`,
       }),
       signal: AbortSignal.timeout(10_000),
     });
@@ -39,9 +41,9 @@ export class ResendEmailService {
     }
   }
 
-  private getConfiguration(): ResendConfiguration {
-    const apiKey = process.env['RESEND_API_KEY']?.trim();
-    const from = process.env['RESEND_FROM_EMAIL']?.trim();
+  private getConfiguration(): BrevoConfiguration {
+    const apiKey = process.env['BREVO_API_KEY']?.trim();
+    const from = process.env['BREVO_FROM_EMAIL']?.trim();
     const configuredFrontendUrl = process.env['FRONTEND_URL']?.trim();
     const frontendUrlValue =
       configuredFrontendUrl ||
@@ -55,8 +57,11 @@ export class ResendEmailService {
       );
     }
 
-    const senderAddress = from.match(/<([^<>]+)>$/)?.[1] ?? from;
-    if (!/^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(senderAddress)) {
+    const senderEmail = from.match(/<([^<>]+)>$/)?.[1] ?? from;
+    const senderName = from.includes('<')
+      ? from.slice(0, from.indexOf('<')).trim() || 'Conecta'
+      : 'Conecta';
+    if (!/^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(senderEmail)) {
       throw new ServiceUnavailableException(
         'O serviço de recuperação de senha não está configurado',
       );
@@ -83,6 +88,6 @@ export class ResendEmailService {
       );
     }
 
-    return { apiKey, from, frontendUrl };
+    return { apiKey, senderName, senderEmail, frontendUrl };
   }
 }

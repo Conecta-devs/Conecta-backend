@@ -1,16 +1,16 @@
 import { ServiceUnavailableException } from '@nestjs/common';
 import { vi } from 'vitest';
-import { ResendEmailService } from './resend-email.service.js';
+import { BrevoEmailService } from './brevo-email.service.js';
 
-describe('ResendEmailService', () => {
-  let service: ResendEmailService;
+describe('BrevoEmailService', () => {
+  let service: BrevoEmailService;
 
   beforeEach(() => {
-    vi.stubEnv('RESEND_API_KEY', 'test-api-key');
-    vi.stubEnv('RESEND_FROM_EMAIL', 'Conecta <noreply@example.com>');
+    vi.stubEnv('BREVO_API_KEY', 'test-api-key');
+    vi.stubEnv('BREVO_FROM_EMAIL', 'Conecta <mike.ensergueix@gmail.com>');
     vi.stubEnv('FRONTEND_URL', 'http://localhost:5173');
     vi.stubEnv('NODE_ENV', 'development');
-    service = new ResendEmailService();
+    service = new BrevoEmailService();
   });
 
   afterEach(() => {
@@ -18,7 +18,7 @@ describe('ResendEmailService', () => {
     vi.unstubAllGlobals();
   });
 
-  it('sends a reset link through the Resend API using configured sender and frontend', async () => {
+  it('envia o link pela API do Brevo com remetente e frontend configurados', async () => {
     const fetchMock = vi.fn().mockResolvedValue({ ok: true });
     vi.stubGlobal('fetch', fetchMock);
 
@@ -26,23 +26,28 @@ describe('ResendEmailService', () => {
 
     expect(fetchMock).toHaveBeenCalledOnce();
     const [url, options] = fetchMock.mock.calls[0];
-    expect(url).toBe('https://api.resend.com/emails');
+    expect(url).toBe('https://api.brevo.com/v3/smtp/email');
     expect(options.headers).toEqual(
       expect.objectContaining({
-        Authorization: 'Bearer test-api-key',
+        'api-key': 'test-api-key',
         'Content-Type': 'application/json',
       }),
     );
     const body = JSON.parse(options.body);
-    expect(body.to).toEqual(['user@example.com']);
-    expect(body.from).toBe('Conecta <noreply@example.com>');
-    expect(body.text).toContain(
+    expect(body.sender).toEqual({
+      name: 'Conecta',
+      email: 'mike.ensergueix@gmail.com',
+    });
+    expect(body.to).toEqual([{ email: 'user@example.com' }]);
+    expect(body.subject).toBe('Redefinição de senha do Conecta');
+    expect(body.textContent).toContain(
       'http://localhost:5173/reset-password?token=' + 'a'.repeat(43),
     );
+    expect(body.htmlContent).toContain('Redefinir senha');
   });
 
-  it('rejects missing Resend settings before making a request', async () => {
-    vi.stubEnv('RESEND_API_KEY', '');
+  it('rejeita configuração ausente antes de chamar a API', async () => {
+    vi.stubEnv('BREVO_API_KEY', '');
     const fetchMock = vi.fn();
     vi.stubGlobal('fetch', fetchMock);
 
@@ -52,7 +57,7 @@ describe('ResendEmailService', () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it('requires an HTTPS frontend URL in production', () => {
+  it('exige HTTPS no frontend em produção', () => {
     vi.stubEnv('NODE_ENV', 'production');
 
     expect(() => service.assertConfigured()).toThrow(
@@ -60,15 +65,15 @@ describe('ResendEmailService', () => {
     );
   });
 
-  it('rejects a malformed sender before sending', () => {
-    vi.stubEnv('RESEND_FROM_EMAIL', 'not-an-email');
+  it('rejeita remetente malformado', () => {
+    vi.stubEnv('BREVO_FROM_EMAIL', 'not-an-email');
 
     expect(() => service.assertConfigured()).toThrow(
       ServiceUnavailableException,
     );
   });
 
-  it('does not treat a provider error response as success', async () => {
+  it('não trata erro do provedor como sucesso', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false }));
 
     await expect(
