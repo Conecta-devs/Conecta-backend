@@ -160,4 +160,50 @@ describe('ChatGateway', () => {
     await gateway.handleDisconnect({ data: { user } } as Socket & { data: { user: typeof user } });
     expect(Reflect.get(gateway, 'sendWindows').has(user.sub)).toBe(false);
   });
+
+  it('broadcasts typing only to the conversation room and excludes the sender', async () => {
+    getConversation.mockResolvedValue({ id: conversationId });
+    const emit = vi.fn();
+    const to = vi.fn(() => ({ emit }));
+    const client = { data: { user }, to } as unknown as Socket & {
+      data: { user: typeof user };
+    };
+
+    await gateway.handleTyping(client, { conversationId });
+
+    expect(getConversation).toHaveBeenCalledWith(user.sub, conversationId);
+    expect(to).toHaveBeenCalledWith(`conversation:${conversationId}`);
+    expect(emit).toHaveBeenCalledWith('chat:typing', {
+      conversationId,
+      userId: user.sub,
+    });
+  });
+
+  it('ignores typing from users who are not conversation members', async () => {
+    getConversation.mockRejectedValue(new NotFoundException());
+    const emit = vi.fn();
+    const to = vi.fn(() => ({ emit }));
+    const client = { data: { user }, to } as unknown as Socket & {
+      data: { user: typeof user };
+    };
+
+    await expect(
+      gateway.handleTyping(client, { conversationId }),
+    ).resolves.toBeUndefined();
+    expect(emit).not.toHaveBeenCalled();
+  });
+
+  it('ignores a malformed typing payload without throwing', async () => {
+    const emit = vi.fn();
+    const to = vi.fn(() => ({ emit }));
+    const client = { data: { user }, to } as unknown as Socket & {
+      data: { user: typeof user };
+    };
+
+    await expect(
+      gateway.handleTyping(client, { conversationId: 'bad' }),
+    ).resolves.toBeUndefined();
+    expect(getConversation).not.toHaveBeenCalled();
+    expect(emit).not.toHaveBeenCalled();
+  });
 });

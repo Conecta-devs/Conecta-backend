@@ -211,6 +211,23 @@ export class ChatGateway
     });
   }
 
+  @SubscribeMessage('chat:typing')
+  async handleTyping(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() payload: unknown,
+  ): Promise<void> {
+    try {
+      const conversationId = this.readConversationId(payload);
+      await this.chatService.getConversation(client.data.user.sub, conversationId);
+      client.to(this.conversationRoom(conversationId)).emit('chat:typing', {
+        conversationId,
+        userId: client.data.user.sub,
+      });
+    } catch {
+      return;
+    }
+  }
+
   publishMessage(
     message: {
       id: string;
