@@ -118,8 +118,8 @@ PORT=3000
 | `PORT`                  |         ❌          | Porta HTTP da API                                                                        | `3000`                                   |
 | `AUTH_ALLOWED_ORIGINS`  |         ❌          | Origens explícitas permitidas para CORS e autenticação por cookie, separadas por vírgula | Mesma origem da requisição               |
 | `AUTH_COOKIE_SAME_SITE` |         ❌          | Política SameSite do cookie de refresh (`lax` ou `none`; `none` exige HTTPS em produção) | `lax`                                    |
-| `RESEND_API_KEY`        | ✅ para recuperação | Chave privada usada pelo backend para enviar e-mails pelo Resend                         | —                                        |
-| `RESEND_FROM_EMAIL`     | ✅ para recuperação | Remetente autorizado/verificado no Resend                                                | —                                        |
+| `BREVO_API_KEY`         | ✅ para recuperação | Chave da API do Brevo usada pelo backend para enviar e-mails                             | —                                        |
+| `BREVO_FROM_EMAIL`      | ✅ para recuperação | Remetente verificado no Brevo (ex.: `Conecta <mike.ensergueix@gmail.com>`)                | —                                        |
 | `FRONTEND_URL`          |   ✅ em produção    | URL-base usada para montar o link `/reset-password`; produção exige HTTPS                | `http://localhost:5173` fora de produção |
 
 > 🔐 **Nunca coloque credenciais reais no repositório.**  
@@ -341,7 +341,7 @@ Recebe `{ "token": "<token recebido por e-mail>", "password": "<nova senha>" }`.
 
 Ambos os endpoints são limitados a 5 requisições por minuto pelo IP observado pelo Express e por instância do backend. O armazenamento padrão do limitador é em memória; em produção com múltiplas réplicas, configure um armazenamento compartilhado para que o limite seja efetivamente global. O projeto não configura atualmente `trust proxy`; atrás de um proxy reverso, as requisições podem compartilhar o IP do proxy até que a confiança nos encaminhamentos seja configurada explicitamente e com segurança.
 
-Configure `RESEND_API_KEY`, `RESEND_FROM_EMAIL` e, em produção, `FRONTEND_URL` antes de aceitar solicitações. O endereço remetente precisa pertencer a um domínio verificado no Resend. O backend não executa testes de entrega real automaticamente. A página `/reset-password` precisa existir no frontend para concluir o fluxo.
+Configure `BREVO_API_KEY`, `BREVO_FROM_EMAIL` e, em produção, `FRONTEND_URL` antes de aceitar solicitações. O remetente precisa estar verificado no Brevo. O backend não executa testes de entrega real automaticamente. A página `/reset-password` precisa existir no frontend para concluir o fluxo.
 
 A coleção mantém um registro por usuário e a expiração é verificada pela aplicação; não há limpeza automática por TTL. O contrato define índices únicos para `userId` e `tokenHash`, mas a emissão do contrato não os aplica no MongoDB: o ambiente deve aplicar o contrato e confirmar esses índices antes de depender da unicidade em produção. Esta implementação não executou sincronização do banco. O consumo do token é condicionado em um único documento MongoDB. A atualização da senha incrementa `authVersion` por compare-and-set no documento do usuário; o refresh rejeita sessões com uma versão antiga, inclusive sessões criadas por um login concorrente que tenha lido a versão anterior. A revogação explícita das sessões continua sendo uma operação separada, sem transação multi-documento nesta arquitetura. Se uma etapa falhar depois do consumo, o usuário poderá precisar solicitar outro link. Access JWTs já emitidos não são revogados por essa operação e permanecem válidos até expirarem.
 
