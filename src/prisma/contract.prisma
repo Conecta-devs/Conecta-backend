@@ -11,6 +11,8 @@ model User {
   permissao    String?
   authVersion  Int?
   posts        Post[]
+  postLikes    PostLike[]
+  postComments PostComment[]
   sessions     Session[]
   passwordResetToken PasswordResetToken?
   organizedAgendaItems AgendaItem[]
@@ -26,8 +28,35 @@ model Post {
   content  String?
   author   User     @relation(fields: [authorId], references: [id])
   authorId ObjectId
+  likes    PostLike[]
+  comments PostComment[]
 
   @@map("posts")
+}
+
+model PostLike {
+  id        ObjectId @id @map("_id")
+  postId    ObjectId
+  post      Post     @relation(fields: [postId], references: [id])
+  userId    ObjectId
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime
+
+  @@unique([postId, userId])
+  @@map("post_likes")
+}
+
+model PostComment {
+  id        ObjectId @id @map("_id")
+  postId    ObjectId
+  post      Post     @relation(fields: [postId], references: [id])
+  authorId  ObjectId
+  author    User     @relation(fields: [authorId], references: [id])
+  content   String
+  createdAt DateTime
+
+  @@index([postId, createdAt])
+  @@map("post_comments")
 }
 
 model Session {

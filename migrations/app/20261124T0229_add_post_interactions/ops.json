@@ -1,0 +1,260 @@
+[
+  {
+    "id": "collection.post_comments.create",
+    "label": "Create collection post_comments",
+    "operationClass": "additive",
+    "precheck": [
+      {
+        "description": "collection post_comments does not exist",
+        "source": {
+          "kind": "listCollections"
+        },
+        "filter": {
+          "kind": "field",
+          "field": "name",
+          "op": "$eq",
+          "value": "post_comments"
+        },
+        "expect": "notExists"
+      }
+    ],
+    "execute": [
+      {
+        "description": "create collection post_comments",
+        "command": {
+          "kind": "createCollection",
+          "collection": "post_comments",
+          "validator": {
+            "$jsonSchema": {
+              "additionalProperties": false,
+              "bsonType": "object",
+              "properties": {
+                "_id": {
+                  "bsonType": "objectId"
+                },
+                "authorId": {
+                  "bsonType": "objectId"
+                },
+                "content": {
+                  "bsonType": "string"
+                },
+                "createdAt": {
+                  "bsonType": "date"
+                },
+                "postId": {
+                  "bsonType": "objectId"
+                }
+              },
+              "required": [
+                "_id",
+                "authorId",
+                "content",
+                "createdAt",
+                "postId"
+              ]
+            }
+          },
+          "validationLevel": "strict",
+          "validationAction": "error"
+        }
+      }
+    ],
+    "postcheck": []
+  },
+  {
+    "id": "collection.post_likes.create",
+    "label": "Create collection post_likes",
+    "operationClass": "additive",
+    "precheck": [
+      {
+        "description": "collection post_likes does not exist",
+        "source": {
+          "kind": "listCollections"
+        },
+        "filter": {
+          "kind": "field",
+          "field": "name",
+          "op": "$eq",
+          "value": "post_likes"
+        },
+        "expect": "notExists"
+      }
+    ],
+    "execute": [
+      {
+        "description": "create collection post_likes",
+        "command": {
+          "kind": "createCollection",
+          "collection": "post_likes",
+          "validator": {
+            "$jsonSchema": {
+              "additionalProperties": false,
+              "bsonType": "object",
+              "properties": {
+                "_id": {
+                  "bsonType": "objectId"
+                },
+                "createdAt": {
+                  "bsonType": "date"
+                },
+                "postId": {
+                  "bsonType": "objectId"
+                },
+                "userId": {
+                  "bsonType": "objectId"
+                }
+              },
+              "required": [
+                "_id",
+                "createdAt",
+                "postId",
+                "userId"
+              ]
+            }
+          },
+          "validationLevel": "strict",
+          "validationAction": "error"
+        }
+      }
+    ],
+    "postcheck": []
+  },
+  {
+    "id": "index.post_comments.create(postId:1,createdAt:1)",
+    "label": "Create index on post_comments (postId:1, createdAt:1)",
+    "operationClass": "additive",
+    "precheck": [
+      {
+        "description": "index does not already exist on post_comments",
+        "source": {
+          "kind": "listIndexes",
+          "collection": "post_comments"
+        },
+        "filter": {
+          "kind": "field",
+          "field": "key",
+          "op": "$eq",
+          "value": {
+            "postId": 1,
+            "createdAt": 1
+          }
+        },
+        "expect": "notExists"
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index on post_comments",
+        "command": {
+          "kind": "createIndex",
+          "collection": "post_comments",
+          "keys": [
+            {
+              "direction": 1,
+              "field": "postId"
+            },
+            {
+              "direction": 1,
+              "field": "createdAt"
+            }
+          ],
+          "name": "postId_1_createdAt_1"
+        }
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "index exists on post_comments",
+        "source": {
+          "kind": "listIndexes",
+          "collection": "post_comments"
+        },
+        "filter": {
+          "kind": "field",
+          "field": "key",
+          "op": "$eq",
+          "value": {
+            "postId": 1,
+            "createdAt": 1
+          }
+        },
+        "expect": "exists"
+      }
+    ]
+  },
+  {
+    "id": "index.post_likes.create(postId:1,userId:1)",
+    "label": "Create index on post_likes (postId:1, userId:1)",
+    "operationClass": "additive",
+    "precheck": [
+      {
+        "description": "index does not already exist on post_likes",
+        "source": {
+          "kind": "listIndexes",
+          "collection": "post_likes"
+        },
+        "filter": {
+          "kind": "field",
+          "field": "key",
+          "op": "$eq",
+          "value": {
+            "postId": 1,
+            "userId": 1
+          }
+        },
+        "expect": "notExists"
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index on post_likes",
+        "command": {
+          "kind": "createIndex",
+          "collection": "post_likes",
+          "keys": [
+            {
+              "direction": 1,
+              "field": "postId"
+            },
+            {
+              "direction": 1,
+              "field": "userId"
+            }
+          ],
+          "unique": true,
+          "name": "postId_1_userId_1"
+        }
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "index exists on post_likes",
+        "source": {
+          "kind": "listIndexes",
+          "collection": "post_likes"
+        },
+        "filter": {
+          "kind": "and",
+          "exprs": [
+            {
+              "kind": "field",
+              "field": "key",
+              "op": "$eq",
+              "value": {
+                "postId": 1,
+                "userId": 1
+              }
+            },
+            {
+              "kind": "field",
+              "field": "unique",
+              "op": "$eq",
+              "value": true
+            }
+          ]
+        },
+        "expect": "exists"
+      }
+    ]
+  }
+]

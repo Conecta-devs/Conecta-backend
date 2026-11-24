@@ -18,7 +18,7 @@ import type {
 } from '@prisma/orm-mongo/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'44d6dbad48eb52c5a2907db6cf4b292a417e49f7621838386ffcc25973d6fb7d'>;
+  StorageHashBase<'134b3def7a3e8b93de07a1f4025a623dcc2583432c78acb82636f48187c513ec'>;
 export type ExecutionHash = ExecutionHashBase<string>;
 export type ProfileHash =
   ProfileHashBase<'251b3ce23f6c9f561892e7c1af9d2cc941a13d64ba1aa7226b90036b09568cc3'>;
@@ -96,6 +96,19 @@ export type FieldOutputTypes = {
       readonly title: CodecTypes['mongo/string@1']['output'];
       readonly content: CodecTypes['mongo/string@1']['output'] | null;
       readonly authorId: CodecTypes['mongo/objectId@1']['output'];
+    };
+    readonly PostComment: {
+      readonly _id: CodecTypes['mongo/objectId@1']['output'];
+      readonly postId: CodecTypes['mongo/objectId@1']['output'];
+      readonly authorId: CodecTypes['mongo/objectId@1']['output'];
+      readonly content: CodecTypes['mongo/string@1']['output'];
+      readonly createdAt: CodecTypes['mongo/date@1']['output'];
+    };
+    readonly PostLike: {
+      readonly _id: CodecTypes['mongo/objectId@1']['output'];
+      readonly postId: CodecTypes['mongo/objectId@1']['output'];
+      readonly userId: CodecTypes['mongo/objectId@1']['output'];
+      readonly createdAt: CodecTypes['mongo/date@1']['output'];
     };
     readonly Session: {
       readonly _id: CodecTypes['mongo/objectId@1']['output'];
@@ -190,6 +203,19 @@ export type FieldInputTypes = {
       readonly content: CodecTypes['mongo/string@1']['input'] | null;
       readonly authorId: CodecTypes['mongo/objectId@1']['input'];
     };
+    readonly PostComment: {
+      readonly _id: CodecTypes['mongo/objectId@1']['input'];
+      readonly postId: CodecTypes['mongo/objectId@1']['input'];
+      readonly authorId: CodecTypes['mongo/objectId@1']['input'];
+      readonly content: CodecTypes['mongo/string@1']['input'];
+      readonly createdAt: CodecTypes['mongo/date@1']['input'];
+    };
+    readonly PostLike: {
+      readonly _id: CodecTypes['mongo/objectId@1']['input'];
+      readonly postId: CodecTypes['mongo/objectId@1']['input'];
+      readonly userId: CodecTypes['mongo/objectId@1']['input'];
+      readonly createdAt: CodecTypes['mongo/date@1']['input'];
+    };
     readonly Session: {
       readonly _id: CodecTypes['mongo/objectId@1']['input'];
       readonly userId: CodecTypes['mongo/objectId@1']['input'];
@@ -224,12 +250,20 @@ export namespace Models {
     permissao: CodecTypes['mongo/string@1']['output'] | null;
     authVersion: CodecTypes['mongo/int32@1']['output'] | null;
     posts: unbound_Post[];
+    postLikes: unbound_PostLike[];
+    postComments: unbound_PostComment[];
     sessions: unbound_Session[];
     passwordResetToken: unbound_PasswordResetToken | null;
     organizedAgendaItems: unbound_AgendaItem[];
     agendaParticipations: unbound_AgendaParticipation[];
     readonly [RelationKeys]?:
-      'posts' | 'sessions' | 'passwordResetToken' | 'organizedAgendaItems' | 'agendaParticipations';
+      | 'posts'
+      | 'postLikes'
+      | 'postComments'
+      | 'sessions'
+      | 'passwordResetToken'
+      | 'organizedAgendaItems'
+      | 'agendaParticipations';
   };
   export type unbound_Post = {
     _id: CodecTypes['mongo/objectId@1']['output'];
@@ -237,7 +271,28 @@ export namespace Models {
     content: CodecTypes['mongo/string@1']['output'] | null;
     authorId: CodecTypes['mongo/objectId@1']['output'];
     author: unbound_User;
-    readonly [RelationKeys]?: 'author';
+    likes: unbound_PostLike[];
+    comments: unbound_PostComment[];
+    readonly [RelationKeys]?: 'author' | 'likes' | 'comments';
+  };
+  export type unbound_PostLike = {
+    _id: CodecTypes['mongo/objectId@1']['output'];
+    postId: CodecTypes['mongo/objectId@1']['output'];
+    userId: CodecTypes['mongo/objectId@1']['output'];
+    createdAt: CodecTypes['mongo/date@1']['output'];
+    post: unbound_Post;
+    user: unbound_User;
+    readonly [RelationKeys]?: 'post' | 'user';
+  };
+  export type unbound_PostComment = {
+    _id: CodecTypes['mongo/objectId@1']['output'];
+    postId: CodecTypes['mongo/objectId@1']['output'];
+    authorId: CodecTypes['mongo/objectId@1']['output'];
+    content: CodecTypes['mongo/string@1']['output'];
+    createdAt: CodecTypes['mongo/date@1']['output'];
+    post: unbound_Post;
+    author: unbound_User;
+    readonly [RelationKeys]?: 'post' | 'author';
   };
   export type unbound_Session = {
     _id: CodecTypes['mongo/objectId@1']['output'];
@@ -330,6 +385,8 @@ export declare const models: {
   __unbound__: {
     User: Models.unbound_User;
     Post: Models.unbound_Post;
+    PostLike: Models.unbound_PostLike;
+    PostComment: Models.unbound_PostComment;
     Session: Models.unbound_Session;
     PasswordResetToken: Models.unbound_PasswordResetToken;
     AgendaItem: Models.unbound_AgendaItem;
@@ -595,6 +652,64 @@ type ContractBase = Omit<
                 readonly validationAction: 'error';
               };
             };
+            readonly post_comments: {
+              readonly kind: 'mongo-collection';
+              readonly indexes: readonly [
+                {
+                  readonly kind: 'mongo-index';
+                  readonly keys: readonly [
+                    { readonly field: 'postId'; readonly direction: 1 },
+                    { readonly field: 'createdAt'; readonly direction: 1 },
+                  ];
+                },
+              ];
+              readonly validator: {
+                readonly kind: 'mongo-validator';
+                readonly jsonSchema: {
+                  readonly bsonType: 'object';
+                  readonly properties: {
+                    readonly _id: { readonly bsonType: 'objectId' };
+                    readonly postId: { readonly bsonType: 'objectId' };
+                    readonly authorId: { readonly bsonType: 'objectId' };
+                    readonly content: { readonly bsonType: 'string' };
+                    readonly createdAt: { readonly bsonType: 'date' };
+                  };
+                  readonly additionalProperties: false;
+                  readonly required: readonly ['_id', 'authorId', 'content', 'createdAt', 'postId'];
+                };
+                readonly validationLevel: 'strict';
+                readonly validationAction: 'error';
+              };
+            };
+            readonly post_likes: {
+              readonly kind: 'mongo-collection';
+              readonly indexes: readonly [
+                {
+                  readonly kind: 'mongo-index';
+                  readonly keys: readonly [
+                    { readonly field: 'postId'; readonly direction: 1 },
+                    { readonly field: 'userId'; readonly direction: 1 },
+                  ];
+                  readonly unique: true;
+                },
+              ];
+              readonly validator: {
+                readonly kind: 'mongo-validator';
+                readonly jsonSchema: {
+                  readonly bsonType: 'object';
+                  readonly properties: {
+                    readonly _id: { readonly bsonType: 'objectId' };
+                    readonly postId: { readonly bsonType: 'objectId' };
+                    readonly userId: { readonly bsonType: 'objectId' };
+                    readonly createdAt: { readonly bsonType: 'date' };
+                  };
+                  readonly additionalProperties: false;
+                  readonly required: readonly ['_id', 'createdAt', 'postId', 'userId'];
+                };
+                readonly validationLevel: 'strict';
+                readonly validationAction: 'error';
+              };
+            };
             readonly posts: {
               readonly kind: 'mongo-collection';
               readonly validator: {
@@ -690,6 +805,14 @@ type ContractBase = Omit<
   readonly roots: {
     readonly users: { readonly namespace: '__unbound__' & NamespaceId; readonly model: 'User' };
     readonly posts: { readonly namespace: '__unbound__' & NamespaceId; readonly model: 'Post' };
+    readonly post_likes: {
+      readonly namespace: '__unbound__' & NamespaceId;
+      readonly model: 'PostLike';
+    };
+    readonly post_comments: {
+      readonly namespace: '__unbound__' & NamespaceId;
+      readonly model: 'PostComment';
+    };
     readonly sessions: {
       readonly namespace: '__unbound__' & NamespaceId;
       readonly model: 'Session';
@@ -1061,8 +1184,128 @@ type ContractBase = Omit<
                   readonly targetFields: readonly ['_id'];
                 };
               };
+              readonly likes: {
+                readonly to: {
+                  readonly namespace: '__unbound__' & NamespaceId;
+                  readonly model: 'PostLike';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['_id'];
+                  readonly targetFields: readonly ['postId'];
+                };
+              };
+              readonly comments: {
+                readonly to: {
+                  readonly namespace: '__unbound__' & NamespaceId;
+                  readonly model: 'PostComment';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['_id'];
+                  readonly targetFields: readonly ['postId'];
+                };
+              };
             };
             readonly storage: { readonly collection: 'posts' };
+          };
+          readonly PostComment: {
+            readonly fields: {
+              readonly _id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/objectId@1' };
+              };
+              readonly postId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/objectId@1' };
+              };
+              readonly authorId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/objectId@1' };
+              };
+              readonly content: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/string@1' };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/date@1' };
+              };
+            };
+            readonly relations: {
+              readonly post: {
+                readonly to: {
+                  readonly namespace: '__unbound__' & NamespaceId;
+                  readonly model: 'Post';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['postId'];
+                  readonly targetFields: readonly ['_id'];
+                };
+              };
+              readonly author: {
+                readonly to: {
+                  readonly namespace: '__unbound__' & NamespaceId;
+                  readonly model: 'User';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['authorId'];
+                  readonly targetFields: readonly ['_id'];
+                };
+              };
+            };
+            readonly storage: { readonly collection: 'post_comments' };
+          };
+          readonly PostLike: {
+            readonly fields: {
+              readonly _id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/objectId@1' };
+              };
+              readonly postId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/objectId@1' };
+              };
+              readonly userId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/objectId@1' };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/date@1' };
+              };
+            };
+            readonly relations: {
+              readonly post: {
+                readonly to: {
+                  readonly namespace: '__unbound__' & NamespaceId;
+                  readonly model: 'Post';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['postId'];
+                  readonly targetFields: readonly ['_id'];
+                };
+              };
+              readonly user: {
+                readonly to: {
+                  readonly namespace: '__unbound__' & NamespaceId;
+                  readonly model: 'User';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['userId'];
+                  readonly targetFields: readonly ['_id'];
+                };
+              };
+            };
+            readonly storage: { readonly collection: 'post_likes' };
           };
           readonly Session: {
             readonly fields: {
@@ -1151,6 +1394,28 @@ type ContractBase = Omit<
                 readonly to: {
                   readonly namespace: '__unbound__' & NamespaceId;
                   readonly model: 'Post';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['_id'];
+                  readonly targetFields: readonly ['authorId'];
+                };
+              };
+              readonly postLikes: {
+                readonly to: {
+                  readonly namespace: '__unbound__' & NamespaceId;
+                  readonly model: 'PostLike';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['_id'];
+                  readonly targetFields: readonly ['userId'];
+                };
+              };
+              readonly postComments: {
+                readonly to: {
+                  readonly namespace: '__unbound__' & NamespaceId;
+                  readonly model: 'PostComment';
                 };
                 readonly cardinality: '1:N';
                 readonly on: {
