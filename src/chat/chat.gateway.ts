@@ -3,6 +3,7 @@ import {
   HttpException,
   HttpStatus,
   Injectable,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -89,6 +90,8 @@ export class ChatGateway
   @WebSocketServer()
   private server!: Server;
 
+  private readonly logger = new Logger(ChatGateway.name);
+
   private readonly sendWindows = new Map<
     string,
     { resetAt: number; count: number }
@@ -111,7 +114,18 @@ export class ChatGateway
       const payload =
         await this.jwtService.verifyAsync<Record<string, unknown>>(token);
       client.data.user = this.jwtStrategy.validate(payload);
-      await client.join(this.userRoom(client.data.user.sub));
+      const userId = client.data.user.sub;
+      await client.join(this.userRoom(userId));
+      try {
+        const activeSockets = await this.server
+          ?.in(this.userRoom(userId))
+          .allSockets();
+        if (activeSockets?.size === 1) {
+          await this.publishPresenceChange(userId, true);
+        }
+      } catch (error) {
+        this.logPresenceFailure(userId, error);
+      }
     } catch (error) {
       if (error instanceof UnauthorizedException || this.isJwtError(error)) {
         client.disconnect(true);
@@ -128,10 +142,15 @@ export class ChatGateway
     }
 
     const room = this.userRoom(userId);
-    const activeSockets =
-      (await this.server?.in(room).allSockets()) ?? new Set<string>();
-    if (!activeSockets.size) {
-      this.sendWindows.delete(userId);
+    try {
+      const activeSockets =
+        (await this.server?.in(room).allSockets()) ?? new Set<string>();
+      if (!activeSockets.size) {
+        await this.publishPresenceChange(userId, false);
+        this.sendWindows.delete(userId);
+      }
+    } catch (error) {
+      this.logPresenceFailure(userId, error);
     }
   }
 
@@ -143,11 +162,18 @@ export class ChatGateway
   ) {
     return this.respond(ack, async () => {
       const conversationId = this.readConversationId(payload);
-      await this.chatService.getConversation(
-        client.data.user.sub,
+      const userId = client.data.user.sub;
+      const result = await this.chatService.getConversation(
+        userId,
         conversationId,
       );
       await client.join(this.conversationRoom(conversationId));
+      await this.publishPresenceSnapshot(
+        userId,
+        client,
+        conversationId,
+        result.members,
+      );
       return { conversationId, joined: true };
     });
   }
@@ -448,6 +474,52 @@ export class ChatGateway
         error.name,
       )
     );
+  }
+
+  private async publishPresenceChange(
+    userId: string,
+    online: boolean,
+  ): Promise<void> {
+    try {
+      const conversations = await this.chatService.listConversations(userId);
+      for (const conversation of conversations) {
+        this.server
+          ?.to(this.conversationRoom(conversation.id))
+          .emit('chat:presence:update', { userId, online });
+      }
+    } catch (error) {
+      this.logPresenceFailure(userId, error);
+    }
+  }
+
+  private async publishPresenceSnapshot(
+    userId: string,
+    client: AuthenticatedSocket,
+    conversationId: string,
+    members: Array<{ userId: string }>,
+  ): Promise<void> {
+    try {
+      const server = this.server;
+      if (!server) {
+        return;
+      }
+      const presences = await Promise.all(
+        members.map(async (member) => ({
+          userId: member.userId,
+          online:
+            ((await server.in(this.userRoom(member.userId)).allSockets())
+              ?.size ?? 0) > 0,
+        })),
+      );
+      client.emit('chat:presence:snapshot', { conversationId, presences });
+    } catch (error) {
+      this.logPresenceFailure(userId, error);
+    }
+  }
+
+  private logPresenceFailure(userId: string, error: unknown) {
+    const reason = error instanceof Error ? error.message : String(error);
+    this.logger.warn(`Falha ao publicar presença de ${userId}: ${reason}`);
   }
 
   private requireServer() {
