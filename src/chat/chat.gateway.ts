@@ -121,16 +121,16 @@ export class ChatGateway
     }
   }
 
-  handleDisconnect(client: AuthenticatedSocket) {
+  async handleDisconnect(client: AuthenticatedSocket) {
     const userId = client.data.user?.sub;
     if (!userId) {
       return;
     }
 
-    const activeSockets = this.server?.sockets.adapter.rooms.get(
-      this.userRoom(userId),
-    );
-    if (!activeSockets?.size) {
+    const room = this.userRoom(userId);
+    const activeSockets =
+      (await this.server?.in(room).allSockets()) ?? new Set<string>();
+    if (!activeSockets.size) {
       this.sendWindows.delete(userId);
     }
   }

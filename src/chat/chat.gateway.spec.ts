@@ -140,4 +140,24 @@ describe('ChatGateway', () => {
       }),
     );
   });
+
+  it('mantém a janela enquanto existir outro socket do usuário em outra instância', async () => {
+    const window = { resetAt: Date.now(), count: 1 };
+    Reflect.set(gateway, 'sendWindows', new Map([[user.sub, window]]));
+    const allSockets = vi.fn().mockResolvedValue(new Set(['socket-em-outra-instancia']));
+    const server = { in: vi.fn(() => ({ allSockets })) } as unknown as Server;
+    Reflect.set(gateway, 'server', server);
+    await gateway.handleDisconnect({ data: { user } } as Socket & { data: { user: typeof user } });
+    expect(server.in).toHaveBeenCalledWith(`user:${user.sub}`);
+    expect(allSockets).toHaveBeenCalled();
+    expect(Reflect.get(gateway, 'sendWindows').has(user.sub)).toBe(true);
+  });
+
+  it('remove a janela quando não restam sockets do usuário', async () => {
+    Reflect.set(gateway, 'sendWindows', new Map([[user.sub, { resetAt: Date.now(), count: 1 }]]));
+    const server = { in: vi.fn(() => ({ allSockets: vi.fn().mockResolvedValue(new Set()) })) } as unknown as Server;
+    Reflect.set(gateway, 'server', server);
+    await gateway.handleDisconnect({ data: { user } } as Socket & { data: { user: typeof user } });
+    expect(Reflect.get(gateway, 'sendWindows').has(user.sub)).toBe(false);
+  });
 });
