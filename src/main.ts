@@ -3,6 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule, ObserveInstrument } from './app.module.js';
 import { ValidationPipe } from '@nestjs/common';
 import { getConfiguredAuthOrigins } from './auth/session-cookie.js';
+import { createChatSocketAdapter } from './chat/redis-io.adapter.js';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -26,6 +27,8 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     }),
   );
+
+  app.useWebSocketAdapter(await createChatSocketAdapter(app));
 
   await app.listen(process.env.PORT ?? 3000);
 }
