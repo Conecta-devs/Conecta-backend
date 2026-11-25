@@ -169,6 +169,36 @@ export class AgendaService {
     return await this.toResponse(cancelled);
   }
 
+  async listParticipants(agendaItemId: string, requesterId: string) {
+    const agendaItem = await this.findActiveAgendaItem(agendaItemId);
+
+    if (agendaItem.organizerId !== requesterId) {
+      throw new ForbiddenException('Apenas o organizador pode ver os confirmados.');
+    }
+
+    const participations = await db.orm.agenda_participations
+      .where({ agendaItemId, confirmed: true })
+      .where(MongoFieldFilter.neq('userId', agendaItem.organizerId))
+      .all();
+
+    return Promise.all(
+      participations
+        .filter((participation) => participation.userId !== agendaItem.organizerId)
+        .map(async (participation) => {
+        const user = await db.orm.users
+          .where({ _id: participation.userId })
+          .first();
+
+        return {
+          userId: participation.userId,
+          name: user?.name ?? 'Estudante',
+          image: user?.image ?? null,
+          confirmed: true as const,
+        };
+      }),
+    );
+  }
+
   async getMyParticipation(agendaItemId: string, userId: string) {
     await this.findActiveAgendaItem(agendaItemId);
 

@@ -21,6 +21,7 @@ const mocks = vi.hoisted(() => {
     where: vi.fn(),
     first: vi.fn(),
     upsert: vi.fn(),
+    all: vi.fn(),
   };
   const usersQuery = {
     where: vi.fn(),
@@ -403,5 +404,59 @@ describe('AgendaService', () => {
     ).rejects.toBeInstanceOf(NotFoundException);
     expect(mocks.participationQuery.first).not.toHaveBeenCalled();
     expect(mocks.participationQuery.upsert).not.toHaveBeenCalled();
+  });
+
+  it('lists confirmed attendees without the organizer and fills a fallback name', async () => {
+    mocks.query.first.mockResolvedValue(item);
+    mocks.participationQuery.all.mockResolvedValue([
+      { ...participation, userId: 'aaaaaaaaaaaaaaaaaaaaaaaa', confirmed: true },
+      { ...participation, userId: item.organizerId, confirmed: true },
+    ]);
+    mocks.usersQuery.first
+      .mockResolvedValueOnce({
+        _id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
+        name: 'Marina Costa',
+        image: null,
+      })
+      .mockResolvedValueOnce(undefined);
+
+    await expect(service.listParticipants(item._id, item.organizerId)).resolves.toEqual([
+      {
+        userId: 'aaaaaaaaaaaaaaaaaaaaaaaa',
+        name: 'Marina Costa',
+        image: null,
+        confirmed: true,
+      },
+    ]);
+    expect(mocks.participationQuery.where).toHaveBeenCalledWith({
+      agendaItemId: item._id,
+      confirmed: true,
+    });
+  });
+
+  it('rejects participant listing for a non-organizer', async () => {
+    mocks.query.first.mockResolvedValue(item);
+
+    await expect(
+      service.listParticipants(item._id, participation.userId),
+    ).rejects.toBeInstanceOf(ForbiddenException);
+    expect(mocks.participationQuery.all).not.toHaveBeenCalled();
+  });
+
+  it('uses the fallback name for a missing confirmed user', async () => {
+    mocks.query.first.mockResolvedValue(item);
+    mocks.participationQuery.all.mockResolvedValue([
+      { ...participation, userId: 'aaaaaaaaaaaaaaaaaaaaaaaa', confirmed: true },
+    ]);
+    mocks.usersQuery.first.mockResolvedValue(undefined);
+
+    await expect(service.listParticipants(item._id, item.organizerId)).resolves.toEqual([
+      {
+        userId: 'aaaaaaaaaaaaaaaaaaaaaaaa',
+        name: 'Estudante',
+        image: null,
+        confirmed: true,
+      },
+    ]);
   });
 });

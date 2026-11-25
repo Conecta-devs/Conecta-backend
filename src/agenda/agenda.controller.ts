@@ -64,6 +64,14 @@ export class AgendaController {
     return this.agendaService.cancel(id, request.user.sub);
   }
 
+  @Get(':id/participants')
+  listParticipants(
+    @Req() request: AuthenticatedRequest,
+    @Param('id') id: string,
+  ) {
+    return this.agendaService.listParticipants(id, request.user.sub);
+  }
+
   @Get(':id/participation/me')
   getMyParticipation(
     @Req() request: AuthenticatedRequest,

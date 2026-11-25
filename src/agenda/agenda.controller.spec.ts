@@ -105,4 +105,21 @@ describe('AgendaController', () => {
       true,
     );
   });
+
+  it('passes the authenticated subject to participant listing', async () => {
+    const service = new AgendaService();
+    const spy = vi.spyOn(service, 'listParticipants').mockResolvedValue([]);
+    const controller = new AgendaController(service);
+    const request = {
+      user: { sub: 'authenticated-user', email: 'user@example.com', name: 'User' },
+    } as Parameters<AgendaController['getMyParticipation']>[0];
+
+    await expect(
+      controller.listParticipants(request, '0123456789abcdef01234567'),
+    ).resolves.toEqual([]);
+    expect(spy).toHaveBeenCalledWith(
+      '0123456789abcdef01234567',
+      'authenticated-user',
+    );
+  });
 });
