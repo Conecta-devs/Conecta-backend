@@ -226,7 +226,10 @@ export class AgendaService {
     userId: string,
     interested: UpdateParticipationInterestDto['interested'],
   ) {
-    await this.findActiveAgendaItem(agendaItemId);
+    const agendaItem = await this.findActiveAgendaItem(agendaItemId);
+    if (agendaItem.organizerId === userId) {
+      throw new ForbiddenException('O organizador não pode marcar interesse ou presença no próprio encontro.');
+    }
     const now = new Date();
 
     const participation = await db.orm.agenda_participations
@@ -254,7 +257,10 @@ export class AgendaService {
     userId: string,
     confirmed: UpdateParticipationAttendanceDto['confirmed'],
   ) {
-    await this.findActiveAgendaItem(agendaItemId);
+    const agendaItem = await this.findActiveAgendaItem(agendaItemId);
+    if (agendaItem.organizerId === userId) {
+      throw new ForbiddenException('O organizador não pode marcar interesse ou presença no próprio encontro.');
+    }
     const now = new Date();
 
     const participation = await db.orm.agenda_participations

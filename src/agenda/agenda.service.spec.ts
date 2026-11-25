@@ -459,4 +459,22 @@ describe('AgendaService', () => {
       },
     ]);
   });
+
+  it('forbids the organizer from changing interest on their own event', async () => {
+    mocks.query.first.mockResolvedValue(item);
+
+    await expect(
+      service.updateMyInterest(item._id, item.organizerId, true),
+    ).rejects.toBeInstanceOf(ForbiddenException);
+    expect(mocks.participationQuery.upsert).not.toHaveBeenCalled();
+  });
+
+  it('forbids the organizer from changing attendance on their own event', async () => {
+    mocks.query.first.mockResolvedValue(item);
+
+    await expect(
+      service.updateMyAttendance(item._id, item.organizerId, true),
+    ).rejects.toBeInstanceOf(ForbiddenException);
+    expect(mocks.participationQuery.upsert).not.toHaveBeenCalled();
+  });
 });
